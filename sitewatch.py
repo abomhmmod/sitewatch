@@ -40,6 +40,7 @@ UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.3
 KEEP_KEYS = 600          # ما يُحفظ من مفاتيح كلّ مصدر
 MAX_SINGLE = 10          # إن زاد جديد مصدرٍ على هذا جُمع في رسالة واحدة
 FAIL_ALERT = 3           # تنبيه بعد هذا العدد من الإخفاقات المتتالية
+MAX_PLAYLISTS = 8        # أقصى عدد أزرار القوائم تحت الفيديو
 
 
 class Blocked(Exception):
@@ -230,10 +231,11 @@ def yt_mine(method, endpoint, body=None, **params):
 
 
 def my_playlists(cfg):
-    """قوائم التشغيل المذكورة في playlists من الإعدادات، بأسمائها في يوتيوب: [(المعرّف، الاسم)]، أو [] بلا إذن."""
+    """قوائم التشغيل التي لها أزرار: [(المعرّف، الاسم)]، أو [] بلا إذن. وplaylists في الإعدادات إمّا "all"
+    (كلّ قوائم حسابك، فالقائمة التي تنشئها في يوتيوب يظهر زرّها وحده)، وإمّا أسماءٌ بعينها كما هي في يوتيوب."""
     if 'pl' not in _oauth:
         _oauth['pl'] = []
-        names = cfg.get('playlists') or []
+        names = cfg.get('playlists', 'all')
         if names and yt_token():
             have, page = {}, None
             try:
@@ -247,7 +249,7 @@ def my_playlists(cfg):
                         break
             except Exception as e:
                 print(f'    قوائم التشغيل: تعذّرت قراءتها ({e})')
-            for n in names:
+            for n in (list(have) if names == 'all' else names)[:MAX_PLAYLISTS]:
                 if n in have:
                     _oauth['pl'].append((have[n], n))
                 elif have:

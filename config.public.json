@@ -1,5 +1,5 @@
 {
-  "playlists": [],
+  "playlists": "all",
   "sources": [
     {"id": "youtube", "name": "يوتيوب", "type": "youtube", "preview": true, "fail_alert": 24, "max_single": 60},
     {"id": "anikoto", "name": "Anikoto", "type": "anikoto",
