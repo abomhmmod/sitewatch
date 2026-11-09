@@ -416,7 +416,7 @@ def read_tvmaze(src):
 
 
 def read_page_links(src):
-    """صفحة عاديّة: روابطها التي تطابق نمطًا. (للمواقع المحجوبة اليوم؛ تُجرَّب في --probe.)"""
+    """صفحة عاديّة: روابطها التي تطابق نمطًا (pattern)، ومعها pages صفحةً إن ذُكرت."""
     from bs4 import BeautifulSoup
     r = get(src['url'])
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -427,11 +427,27 @@ def read_page_links(src):
         raise ValueError(f'لا روابط تطابق النمط. العنوان: {clean(soup.title.string if soup.title else "")!r}، '
                          f'الرابط النهائيّ: {r.url}، الحجم: {len(r.text)}، أمثلة: {sample}')
     out, seen = [], set()
-    for a in soup.select('a[href]'):
-        href, text = a['href'], clean(a.get_text())
-        if pat.search(href) and text and href not in seen:
-            seen.add(href)
-            out.append({'key': href, 'title': text, 'url': href})
+
+    def collect(soup):
+        n = 0
+        for a in soup.select('a[href]'):
+            href, text = a['href'], clean(a.get_text())
+            if pat.search(href) and text and href not in seen:
+                seen.add(href)
+                out.append({'key': href, 'title': text, 'url': href})
+                n += 1
+        return n
+
+    collect(soup)
+    # pages: صفحاتٌ تالية تُقرأ أيضًا (url/page/2/ …)، فلا يضيع ما يُنشر دفعةً واحدة أكثر من صفحة
+    for n in range(2, src.get('pages', 1) + 1):
+        try:
+            nxt = BeautifulSoup(get(f"{src['url'].rstrip('/')}/page/{n}/").text, 'html.parser')
+        except Exception as e:
+            print(f"    {src['id']}: الصفحة {n}: {e}")
+            break
+        if not collect(nxt):
+            break
     return out
 
 

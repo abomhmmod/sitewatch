@@ -20,7 +20,7 @@
     {"id": "witanime", "name": "WitAnime", "type": "page_links", "enabled": false,
      "url": "https://witanime.site/", "pattern": "/episode/"},
     {"id": "egydead", "name": "EgyDead", "type": "page_links",
-     "url": "https://tv9.egydead.live/episode/", "pattern": "/episodes/(?!page/)[^/]+/?$"},
+     "url": "https://tv9.egydead.live/episode/", "pattern": "/episodes/(?!page/)[^/]+/?$", "pages": 3},
     {"id": "telepisodes", "name": "telepisodes", "type": "page_links", "enabled": false,
      "url": "https://telepisodes.org/tv-series/impractical-jokers/", "pattern": "/episode"}
   ]
