@@ -101,19 +101,33 @@ def read_rss(src):
     """خلاصة RSS أو Atom. ومعها اختياريًّا:
     pages_hours: تُقرأ صفحات الخلاصة الأقدم (?paged=2…) حتّى تبلغ ما نُشر قبل هذه الساعات، فلا يضيع ما يُنشر دفعةً
                  واحدة أكثر من صفحة (حتّى max_pages صفحات).
-    series_list: صفحةٌ فيها أسماء المسلسلات المطلوبة (مثل قائمة الكرتون في WCO)، فلا يبقى إلّا ما تصنيفه منها."""
-    out = rss_page(src['url'])
-    if src.get('pages_hours'):
-        cutoff = (datetime.now(timezone.utc) - timedelta(hours=src['pages_hours'])).isoformat()
-        sep = '&' if '?' in src['url'] else '?'
-        for n in range(2, src.get('max_pages', 10) + 1):
-            dates = [it['date'] for it in out if it.get('date')]
-            if not dates or min(dates) < cutoff:
-                break
-            more = rss_page(f"{src['url']}{sep}paged={n}")
-            if not more:
-                break
-            out += more
+    series_list: صفحةٌ فيها أسماء المسلسلات المطلوبة (مثل قائمة الكرتون في WCO)، فلا يبقى إلّا ما تصنيفه منها.
+    extra_urls: خلاصاتٌ أخرى تُضمّ إليها، و{year} فيها السنة الحاليّة (مثل تصنيف «مسلسلات رمضان» لكلّ سنة).
+                والتي لا توجد بعد (404) تُتخطّى."""
+    def feed(url):
+        out = rss_page(url)
+        if src.get('pages_hours'):
+            cutoff = (datetime.now(timezone.utc) - timedelta(hours=src['pages_hours'])).isoformat()
+            sep = '&' if '?' in url else '?'
+            for n in range(2, src.get('max_pages', 10) + 1):
+                dates = [it['date'] for it in out if it.get('date')]
+                if not dates or min(dates) < cutoff:
+                    break
+                more = rss_page(f"{url}{sep}paged={n}")
+                if not more:
+                    break
+                out += more
+        return out
+
+    out = feed(src['url'])
+    for u in src.get('extra_urls', []):
+        try:
+            out += feed(u.format(year=datetime.now().year))
+        except requests.HTTPError as e:
+            if e.response is None or e.response.status_code != 404:
+                raise
+    if src.get('extra_urls'):
+        out.sort(key=lambda it: it.get('date', ''), reverse=True)
     if src.get('series_list'):
         h = get(src['series_list']).text
         want = {clean(t).lower() for t in re.findall(r'<li><a href="/anime/[^"]+" title="([^"]+)"', h)}
@@ -501,7 +515,7 @@ EP_PATTERNS = [
     re.compile(r'^(?P<s>.+?)\s+(?:Season\s+(?P<season>\d+)\s+)?Episode\s+(?P<e>\d+)', re.I),
     re.compile(r'^(?P<s>.+?)\s+S(?P<season>\d+)E(?P<e>\d+)', re.I),
 ]
-PREFIX = re.compile(r'^(?:انمي|أنمي|مسلسل|برنامج)\s+')
+PREFIX = re.compile(r'^(?:مشاهدة\s+)?(?:(?:انمي|أنمي|مسلسل|برنامج)\s+)?')
 FINAL = re.compile(r'ال[اأ]خيرة')
 
 

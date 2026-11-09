@@ -15,6 +15,12 @@
     {"id": "filecr-mine", "icon": "💿", "name": "FileCR", "type": "filecr_pages",
      "_note": "برامج المستخدم: اسم صفحة كلّ برنامج في filecr.com/windows/<slug>/، أو القسم والاسم مثل android/snaptube",
      "programs": ["adobe-photoshop-download-0081", "internet-download-manager", "microsoft-office-2021-2024", "wemod", "7-zip", "mkvtoolnix", "subtitle-edit", "qbittorrent", "honeyview", "yt-dlp", "git-for-windows", "node-js", "python-for-windows", "windows-powershell", "microsoft-powertoys-for-windows-10", "marti-climent-wingetui", "megasync-desktop", "protonvpn", "google-chrome", "mozilla-firefox", "microsoft-edge", "discord", "telegram-desktop", "whatsapp-for-pc", "google-gemini-for-windows", "nvidia-app", "steam", "epic-games-store", "android/snaptube"]},
+    {"id": "mycima-series", "icon": "📡", "name": "ماي سيما · مسلسلات عربية", "type": "rss",
+     "url": "https://mycima.gdn/category/%D9%85%D8%B3%D9%84%D8%B3%D9%84%D8%A7%D8%AA-%D8%B9%D8%B1%D8%A8%D9%8A/feed/",
+     "extra_urls": ["https://mycima.gdn/category/%D9%85%D8%B3%D9%84%D8%B3%D9%84%D8%A7%D8%AA-%D8%B1%D9%85%D8%B6%D8%A7%D9%86-{year}/feed/"],
+     "pages_hours": 3, "_note": "مسلسلات عربي، ومعها مسلسلات رمضان للسنة الحاليّة"},
+    {"id": "mycima-movies", "icon": "🎥", "name": "ماي سيما · أفلام عربية", "type": "rss",
+     "url": "https://mycima.gdn/category/%D8%A7%D9%81%D9%84%D8%A7%D9%85-%D8%B9%D8%B1%D8%A8%D9%8A/feed/", "pages_hours": 3},
     {"id": "fitgirl", "icon": "🎮", "name": "FitGirl Repacks", "type": "rss", "url": "https://fitgirl-repacks.site/feed/"},
     {"id": "github-stars", "icon": "⭐", "name": "GitHub", "type": "github_releases", "user": "abomhmmod"},
 
