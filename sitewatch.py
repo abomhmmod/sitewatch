@@ -159,15 +159,40 @@ def read_github_releases(src):
     return sorted(out, key=lambda x: x['date'], reverse=True)
 
 
+def yt_api(cid, key):
+    """آخر فيديوهات القناة من YouTube Data API: قائمة رفعها (UU…)، وكلّ طلبٍ وحدةٌ واحدة من الحصّة اليوميّة."""
+    r = requests.get('https://www.googleapis.com/youtube/v3/playlistItems', timeout=30, params={
+        'part': 'snippet', 'playlistId': 'UU' + cid[2:], 'maxResults': 15, 'key': key})
+    if r.status_code != 200:   # لا يُذكر الرابط، ففيه المفتاح
+        try:
+            why = r.json()['error']['errors'][0]['reason']
+        except (ValueError, KeyError, IndexError):
+            why = ''
+        raise RuntimeError(f'API HTTP {r.status_code} {why}'.strip())
+    out = []
+    for it in r.json().get('items', []):
+        sn = it['snippet']
+        vid = sn.get('resourceId', {}).get('videoId')
+        if vid:
+            out.append({'key': f'yt:video:{vid}', 'url': f'https://www.youtube.com/watch?v={vid}',
+                        'title': clean(sn.get('title')), 'author': clean(sn.get('channelTitle'))})
+    return out
+
+
 def read_youtube(src):
-    """خلاصة كلّ قناة من YT_CHANNELS. والقناة المضافة حديثًا تُسجَّل فيديوهاتها الحاليّة بلا إرسال."""
+    """آخر فيديوهات كلّ قناة من YT_CHANNELS: من YouTube Data API إن كان المفتاح YT_API_KEY، وإلّا من خلاصتها
+    العامّة (وهي تتعطّل عند يوتيوب من حينٍ لآخر). والقناة المضافة حديثًا تُسجَّل فيديوهاتها الحاليّة بلا إرسال."""
     ids = [c for c in re.split(r'[\s,;]+', os.environ.get('YT_CHANNELS', '')) if c.startswith('UC')]
     if not ids:
         return None   # لا قنوات بعد: يُتخطّى المصدر
+    key = os.environ.get('YT_API_KEY', '').strip()
 
     def feed(cid):
         try:
-            items = read_rss({'url': f'https://www.youtube.com/feeds/videos.xml?channel_id={cid}'})
+            if key:
+                items = yt_api(cid, key)
+            else:
+                items = read_rss({'url': f'https://www.youtube.com/feeds/videos.xml?channel_id={cid}'})
             return [dict(x, group=cid, title=f"{x['author']}: {x['title']}" if x.get('author') else x['title'])
                     for x in items], None
         except Exception as e:

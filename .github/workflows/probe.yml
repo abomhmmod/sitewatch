@@ -25,5 +25,6 @@ jobs:
       - name: probe
         env:
           YT_CHANNELS: ${{ secrets.YT_CHANNELS }}
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: python sitewatch.py --probe
