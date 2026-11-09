@@ -32,6 +32,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           YT_CHANNELS: ${{ secrets.YT_CHANNELS }}
+          YT_SUBSCRIBER: ${{ secrets.YT_SUBSCRIBER }}
           YT_API_KEY: ${{ secrets.YT_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           HOURS: ${{ inputs.hours }}

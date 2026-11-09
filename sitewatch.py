@@ -9,7 +9,9 @@ SiteWatch — يفحص المواقع التي تتابعها، ويرسل جد�
 
 المصادر في config.public.json. والأسرار من متغيّرات البيئة:
   TELEGRAM_TOKEN و TELEGRAM_CHAT_ID  البوت والمحادثة
-  YT_CHANNELS                        معرّفات قنوات يوتيوب (UC...)، كلّ واحدٍ في سطر أو بينها فواصل
+  YT_API_KEY                         مفتاح YouTube Data API
+  YT_SUBSCRIBER                      رابط قناتك: تؤخذ القنوات من اشتراكاتك العامّة، فتتحدّث وحدها
+  YT_CHANNELS                        احتياط: معرّفات قنوات (UC...)، إن لم تُقرأ الاشتراكات
   GITHUB_TOKEN                       اختياريّ: يرفع حدّ طلبات واجهة GitHub
 """
 import argparse
@@ -178,18 +180,49 @@ def read_github_releases(src):
     return sorted(out, key=lambda x: x['date'], reverse=True)
 
 
-def yt_api(cid, key):
-    """آخر فيديوهات القناة من YouTube Data API: قائمة رفعها (UU…)، وكلّ طلبٍ وحدةٌ واحدة من الحصّة اليوميّة."""
-    r = requests.get('https://www.googleapis.com/youtube/v3/playlistItems', timeout=30, params={
-        'part': 'snippet', 'playlistId': 'UU' + cid[2:], 'maxResults': 15, 'key': key})
+def yt_get(endpoint, key, **params):
+    """طلبٌ إلى YouTube Data API. وكلّ طلبٍ وحدةٌ واحدة من الحصّة اليوميّة (10,000)."""
+    r = requests.get(f'https://www.googleapis.com/youtube/v3/{endpoint}', timeout=30, params=dict(params, key=key))
     if r.status_code != 200:   # لا يُذكر الرابط، ففيه المفتاح
         try:
             why = r.json()['error']['errors'][0]['reason']
         except (ValueError, KeyError, IndexError):
             why = ''
         raise RuntimeError(f'API HTTP {r.status_code} {why}'.strip())
+    return r.json()
+
+
+def yt_subscriptions(who, key):
+    """القنوات التي يشترك فيها صاحب القناة who (رابطها أو معرّفها UC… أو @اسمها)، وتلزم أن تكون اشتراكاته عامّة."""
+    m = re.search(r'(UC[\w-]{22})', who)
+    if m:
+        me = m.group(1)
+    else:
+        h = re.search(r'@([\w.\-]+)', who)
+        if not h:
+            raise RuntimeError('YT_SUBSCRIBER ليس رابط قناة ولا معرّفها')
+        found = yt_get('channels', key, part='id', forHandle='@' + h.group(1)).get('items', [])
+        if not found:
+            raise RuntimeError('لم أجد القناة المذكورة في YT_SUBSCRIBER')
+        me = found[0]['id']
+    ids, page = [], None
+    while True:
+        j = yt_get('subscriptions', key, part='snippet', channelId=me, maxResults=50, order='alphabetical',
+                   **({'pageToken': page} if page else {}))
+        ids += [it['snippet']['resourceId']['channelId'] for it in j.get('items', [])]
+        page = j.get('nextPageToken')
+        if not page:
+            break
+    if not ids:
+        raise RuntimeError('قائمة الاشتراكات فارغة')
+    return list(dict.fromkeys(ids))
+
+
+def yt_api(cid, key):
+    """آخر فيديوهات القناة: قائمة رفعها (UU…)."""
+    j = yt_get('playlistItems', key, part='snippet', playlistId='UU' + cid[2:], maxResults=15)
     out = []
-    for it in r.json().get('items', []):
+    for it in j.get('items', []):
         sn = it['snippet']
         vid = sn.get('resourceId', {}).get('videoId')
         if vid:
@@ -200,12 +233,23 @@ def yt_api(cid, key):
 
 
 def read_youtube(src):
-    """آخر فيديوهات كلّ قناة من YT_CHANNELS: من YouTube Data API إن كان المفتاح YT_API_KEY، وإلّا من خلاصتها
-    العامّة (وهي تتعطّل عند يوتيوب من حينٍ لآخر). والقناة المضافة حديثًا تُسجَّل فيديوهاتها الحاليّة بلا إرسال."""
+    """آخر فيديوهات كلّ قناةٍ تشترك فيها. القنوات من اشتراكاتك العامّة إن كان YT_SUBSCRIBER والمفتاح، فتتحدّث
+    القائمة وحدها، وإلّا (أو إن تعذّرت قراءتها) فمن YT_CHANNELS. والفيديوهات من YouTube Data API إن كان المفتاح
+    YT_API_KEY، وإلّا من خلاصة القناة العامّة (وهي تتعطّل عند يوتيوب من حينٍ لآخر).
+    والقناة المضافة حديثًا تُسجَّل فيديوهاتها الحاليّة بلا إرسال."""
+    key = os.environ.get('YT_API_KEY', '').strip()
+    who = os.environ.get('YT_SUBSCRIBER', '').strip()
     ids = [c for c in re.split(r'[\s,;]+', os.environ.get('YT_CHANNELS', '')) if c.startswith('UC')]
+    if who and key:
+        try:
+            ids = yt_subscriptions(who, key)
+            print(f'    يوتيوب: {len(ids)} قناة من اشتراكاتك')
+        except Exception as e:
+            if not ids:
+                raise
+            print(f'    يوتيوب: تعذّرت قراءة اشتراكاتك ({e})، فالقنوات من YT_CHANNELS ({len(ids)})')
     if not ids:
         return None   # لا قنوات بعد: يُتخطّى المصدر
-    key = os.environ.get('YT_API_KEY', '').strip()
 
     def feed(cid):
         pos = ids.index(cid) + 1   # رقم القناة في القائمة، لا معرّفها: سجلّ التشغيل عامّ
