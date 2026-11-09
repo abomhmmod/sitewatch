@@ -1,0 +1,24 @@
+{
+  "sources": [
+    {"id": "youtube", "name": "يوتيوب", "type": "youtube", "preview": true},
+    {"id": "anikoto", "name": "Anikoto", "type": "anikoto",
+     "url": "https://anikototv.to/filter?keyword=&type=&language%5B%5D=sub&sort=latest-updated"},
+    {"id": "wco", "name": "WCO", "type": "rss", "url": "https://www.wco.tv/feed/"},
+    {"id": "carateen", "name": "كراتين", "type": "carateen", "url": "https://carateen.tv/"},
+    {"id": "topcinema", "name": "توب سينما", "type": "rss", "url": "https://topcinemaa.com/feed/"},
+    {"id": "impractical-jokers", "name": "Impractical Jokers", "type": "tvmaze", "show_id": 1139,
+     "link": "https://telepisodes.org/tv-series/impractical-jokers/"},
+    {"id": "filecr", "name": "FileCR", "type": "filecr", "url": "https://filecr.com/us-en/",
+     "sections": ["windows", "pcGames", "android"],
+     "section_names": {"windows": "ويندوز", "pcGames": "ألعاب", "android": "أندرويد", "mac": "ماك"}},
+    {"id": "fitgirl", "name": "FitGirl Repacks", "type": "rss", "url": "https://fitgirl-repacks.site/feed/"},
+    {"id": "github-stars", "name": "GitHub", "type": "github_releases", "user": "abomhmmod"},
+
+    {"id": "witanime", "name": "WitAnime", "type": "page_links", "enabled": false,
+     "url": "https://witanime.site/", "pattern": "/episode/"},
+    {"id": "egydead", "name": "EgyDead", "type": "page_links", "enabled": false,
+     "url": "https://tv9.egydead.live/episode/", "pattern": "/episode/."},
+    {"id": "telepisodes", "name": "telepisodes", "type": "page_links", "enabled": false,
+     "url": "https://telepisodes.org/tv-series/impractical-jokers/", "pattern": "/episode"}
+  ]
+}

@@ -1,0 +1,29 @@
+name: probe-sources
+
+# يجرّب كلّ مصدر من خوادم GitHub (والمعطّلة أيضًا) ويطبع ما وجد، دون إرسال شيء ودون تغيير الحالة.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: |
+          pip install -q -r requirements.txt
+          python -m playwright install --only-shell chromium
+      - name: probe
+        env:
+          YT_CHANNELS: ${{ secrets.YT_CHANNELS }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python sitewatch.py --probe

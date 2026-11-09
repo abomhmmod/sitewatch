@@ -1,0 +1,179 @@
+name: sitewatch
+
+on:
+  schedule:
+    # احتياط. النبضات الدوريّة يقوم بها «الإيقاظ الذاتيّ» (مهمّة wake في آخر هذا الملفّ) كلّ ساعة.
+    # جدولة GitHub تُسقط كثيرًا من مواعيدها، لكنّها تعيد السلسلة إن انقطعت.
+    - cron: '23 */3 * * *'
+  workflow_dispatch:
+    inputs:
+      test_notify:
+        description: 'أرسل رسالة اختبار فقط (دون فحص)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: sitewatch
+      cancel-in-progress: false
+    env:
+      TZ: Asia/Damascus
+      PYTHONUTF8: '1'
+      TEST_NOTIFY: ${{ inputs.test_notify == true }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: فحص رمز البوت
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TELEGRAM_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::error::السرّ TELEGRAM_TOKEN أو TELEGRAM_CHAT_ID غير موجود. توقّف التشغيل قبل الفحص."
+            exit 1
+          fi
+          resp=$(curl -sS --max-time 30 "https://api.telegram.org/bot${TELEGRAM_TOKEN}/getMe" || true)
+          if ! printf '%s' "$resp" | python3 -c 'import json,sys; j=json.load(sys.stdin); assert j.get("ok"); print("البوت:", j["result"]["username"])'; then
+            echo "::error::رفض تيلغرام رمز البوت. توقّف التشغيل قبل الفحص حتّى لا يضيع جديد."
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: تثبيت المكتبات
+        run: |
+          pip install -q -r requirements.txt
+          echo "PW_VERSION=$(python -c 'import importlib.metadata as m; print(m.version("playwright"))')" >> "$GITHUB_ENV"
+
+      - name: ذاكرة متصفّح chromium
+        if: env.TEST_NOTIFY != 'true'
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ env.PW_VERSION }}
+
+      - name: تثبيت chromium (لا يُنزَّل إن كان في الذاكرة)
+        if: env.TEST_NOTIFY != 'true'
+        run: python -m playwright install --only-shell chromium
+
+      - name: رسالة اختبار
+        if: env.TEST_NOTIFY == 'true'
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python sitewatch.py --test
+
+      - name: الفحص
+        if: env.TEST_NOTIFY != 'true'
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          YT_CHANNELS: ${{ secrets.YT_CHANNELS }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python sitewatch.py
+
+      - name: حفظ state.json
+        if: always() && env.TEST_NOTIFY != 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add state.json 2>/dev/null || exit 0
+          if git diff --cached --quiet; then echo 'لا تغيير في الحالة'; exit 0; fi
+          git commit -q -m "state: $(date '+%Y-%m-%d %H:%M')"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
+
+  wake:
+    # الإيقاظ الذاتيّ: بعد انتهاء النبضة ينتظر GitHub مدّة مؤقّت البيئة wake-60 (60 دقيقة؛ تُضبط من
+    # Settings ← Environments)، ثمّ يطلب تشغيلًا جديدًا. والانتظار لا يشغل خادمًا.
+    # إن بدأ في الأثناء تشغيل أحدث فهو الذي يُكمل وهذا يتوقّف، فتبقى سلسلة واحدة.
+    # لا يعمل بعد رسالة الاختبار، ولا إن غاب رمز البوت. وإيقاف البوت يكون بـ Disable workflow.
+    needs: run
+    if: ${{ always() && inputs.test_notify != true && needs.run.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: wake-60
+      deployment: false
+    permissions:
+      actions: write
+    steps:
+      - name: Request the next run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF: ${{ github.event.repository.default_branch || 'main' }}
+          TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # صمام أمان: لا يُطلب تشغيل جديد قبل مرور هذه الثواني على بدء هذا التشغيل، حتّى لا تتتابع
+          # التشغيلات بلا توقّف إن لم يُطبَّق مؤقّت الانتظار.
+          MIN_AGE: 300
+        run: |
+          warn() {
+            echo "::error::$1"
+            [ -n "$TG_TOKEN" ] || return 0
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+              --data-urlencode "chat_id=${TG_CHAT}" \
+              --data-urlencode "text=⚠️ ${GITHUB_REPOSITORY}: $2") || true
+            echo "Telegram warning: HTTP ${code:-none}"
+          }
+          if [ -z "$TG_TOKEN" ]; then
+            echo "No bot token yet, so the chain stops here."
+            exit 0
+          fi
+          wf="${GITHUB_WORKFLOW_REF#*/.github/workflows/}"; wf="${wf%@*}"
+          api="repos/$GITHUB_REPOSITORY/actions/workflows/$wf"
+
+          started=""
+          for i in 1 2 3 4 5 6; do
+            started=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .run_started_at 2>/dev/null) && [ -n "$started" ] && break
+            sleep 20
+          done
+          if [ -z "$started" ]; then
+            warn "Could not reach the GitHub API to read this run's start time." \
+                 "تعذّر الاتّصال بواجهة GitHub، فتوقّف الفحص الدوريّ. لإعادته افتح تبويب Actions في المستودع واضغط Run workflow."
+            exit 1
+          fi
+          age=$(( $(date +%s) - $(date -d "$started" +%s) ))
+          if [ "$age" -lt "$MIN_AGE" ]; then
+            warn "This run is only ${age}s old, so the wait timer was not applied. Not requesting another run." \
+                 "مؤقّت الانتظار لم يُطبَّق، فأوقفتُ الإيقاظ الذاتيّ حتّى لا تتتابع التشغيلات. راجع المؤقّت في Settings ← Environments، وتأكّد أنّ المستودع عامّ، ثمّ اضغط Run workflow في تبويب Actions."
+            exit 1
+          fi
+
+          newest=""
+          for i in 1 2 3 4 5 6; do
+            newest=$(gh api "$api/runs?per_page=1" --jq '.workflow_runs[0] | "\(.id) \(.status)"' 2>/dev/null) && [ -n "$newest" ] && break
+            sleep 20
+          done
+          if [ -n "$newest" ] && [ "${newest%% *}" != "$GITHUB_RUN_ID" ] && [ "${newest#* }" != "completed" ]; then
+            echo "A newer run (${newest%% *}) is under way; it will request the next one."
+            exit 0
+          fi
+
+          err=""
+          for i in 1 2 3 4 5 6 7 8; do
+            if err=$(gh api -X POST "$api/dispatches" -f ref="$REF" 2>&1); then
+              echo "Next run requested."
+              exit 0
+            fi
+            echo "Attempt $i failed: $err"
+            case "$err" in
+              *"disabled workflow"*) echo "The workflow is disabled, so the chain stops here."; exit 0 ;;
+              *"HTTP 403"*|*"HTTP 404"*|*"HTTP 422"*) break ;;
+            esac
+            sleep 45
+          done
+          warn "Could not request the next run: $err" \
+               "تعذّر طلب التشغيل التالي، فتوقّف الفحص الدوريّ. لإعادته افتح تبويب Actions في المستودع واضغط Run workflow."
+          exit 1
