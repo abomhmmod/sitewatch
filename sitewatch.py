@@ -12,6 +12,8 @@ SiteWatch — يفحص المواقع التي تتابعها، ويرسل جد�
   YT_API_KEY                         مفتاح YouTube Data API
   YT_SUBSCRIBER                      رابط قناتك: تؤخذ القنوات من اشتراكاتك العامّة، فتتحدّث وحدها
   YT_CHANNELS                        احتياط: معرّفات قنوات (UC...)، إن لم تُقرأ الاشتراكات
+  YT_CLIENT_ID و YT_CLIENT_SECRET و YT_REFRESH_TOKEN
+                                     إذنك لحسابك في يوتيوب (auth_youtube.py): أزرار «أضف إلى قائمة» تحت كلّ فيديو
   GITHUB_TOKEN                       اختياريّ: يرفع حدّ طلبات واجهة GitHub
 """
 import argparse
@@ -192,6 +194,130 @@ def yt_get(endpoint, key, **params):
     return r.json()
 
 
+_oauth = {}
+
+
+def yt_token():
+    """رمز دخولٍ إلى حسابك في يوتيوب من إذنك المحفوظ (YT_REFRESH_TOKEN)، أو '' إن لم يكن."""
+    if 'tok' not in _oauth:
+        _oauth['tok'] = ''
+        cid, sec, ref = (os.environ.get(k, '').strip() for k in ('YT_CLIENT_ID', 'YT_CLIENT_SECRET', 'YT_REFRESH_TOKEN'))
+        if cid and sec and ref:
+            r = requests.post('https://oauth2.googleapis.com/token', timeout=30, data={
+                'client_id': cid, 'client_secret': sec, 'refresh_token': ref, 'grant_type': 'refresh_token'})
+            if r.ok:
+                _oauth['tok'] = r.json()['access_token']
+            else:   # لا يُطبع الردّ كلّه
+                try:
+                    why = r.json().get('error', '')
+                except ValueError:
+                    why = ''
+                print(f'    إذن يوتيوب: HTTP {r.status_code} {why}'.rstrip())
+    return _oauth['tok']
+
+
+def yt_mine(method, endpoint, body=None, **params):
+    """طلبٌ إلى YouTube Data API باسمك (لقوائم التشغيل)."""
+    r = requests.request(method, f'https://www.googleapis.com/youtube/v3/{endpoint}', timeout=30, params=params,
+                         json=body, headers={'Authorization': f'Bearer {yt_token()}'})
+    if r.status_code != 200:
+        try:
+            why = r.json()['error']['errors'][0]['reason']
+        except (ValueError, KeyError, IndexError):
+            why = ''
+        raise RuntimeError(f'HTTP {r.status_code} {why}'.strip())
+    return r.json()
+
+
+def my_playlists(cfg):
+    """قوائم التشغيل المذكورة في playlists من الإعدادات، بأسمائها في يوتيوب: [(المعرّف، الاسم)]، أو [] بلا إذن."""
+    if 'pl' not in _oauth:
+        _oauth['pl'] = []
+        names = cfg.get('playlists') or []
+        if names and yt_token():
+            have, page = {}, None
+            try:
+                while True:
+                    j = yt_mine('GET', 'playlists', part='snippet', mine='true', maxResults=50,
+                                **({'pageToken': page} if page else {}))
+                    for it in j.get('items', []):
+                        have.setdefault(it['snippet']['title'].strip(), it['id'])
+                    page = j.get('nextPageToken')
+                    if not page:
+                        break
+            except Exception as e:
+                print(f'    قوائم التشغيل: تعذّرت قراءتها ({e})')
+            for n in names:
+                if n in have:
+                    _oauth['pl'].append((have[n], n))
+                elif have:
+                    print(f'    قوائم التشغيل: لا قائمة باسم «{n}» في حسابك')
+    return _oauth['pl']
+
+
+def yt_buttons(cfg, it):
+    """أزرار «أضف إلى قائمة» تحت فيديو يوتيوب، أو None."""
+    if not it['key'].startswith('yt:video:'):
+        return None
+    vid = it['key'][9:]
+    btns = [{'text': f'➕ {name}', 'callback_data': f'p:{pid}:{vid}'} for pid, name in my_playlists(cfg)
+            if len(f'p:{pid}:{vid}'.encode()) <= 64]
+    return {'inline_keyboard': [btns[i:i + 2] for i in range(0, len(btns), 2)]} if btns else None
+
+
+def tg_api(method, **data):
+    token = os.environ['TELEGRAM_TOKEN']
+    data = {k: json.dumps(v) if isinstance(v, (dict, list)) else v for k, v in data.items()}
+    try:
+        return requests.post(f'https://api.telegram.org/bot{token}/{method}', timeout=30, data=data).json()
+    except Exception as e:
+        return {'ok': False, 'description': str(e)}
+
+
+def handle_presses(cfg):
+    """يضيف الفيديوهات التي ضُغطت أزرارها منذ الفحص السابق إلى قوائمها، ويجعل الزرّ «✅»."""
+    chat = str(os.environ['TELEGRAM_CHAT_ID'])
+    j = tg_api('getUpdates', timeout=0, allowed_updates=['callback_query'])
+    if not j.get('ok'):
+        print('الضغطات: تعذّرت قراءتها:', j.get('description'))
+        return
+    ups = j.get('result') or []
+    done, n = set(), 0
+    for u in ups:
+        cq = u.get('callback_query')
+        if not cq or str((cq.get('message') or {}).get('chat', {}).get('id')) != chat:
+            continue
+        data = cq.get('data', '')
+        m = re.fullmatch(r'p:([\w-]+):([\w-]{11})', data)
+        if not m or data in done:
+            tg_api('answerCallbackQuery', callback_query_id=cq['id'])
+            continue
+        done.add(data)
+        markup = cq['message'].get('reply_markup') or {'inline_keyboard': []}
+        label = next((b['text'] for row in markup['inline_keyboard'] for b in row
+                      if b.get('callback_data') == data), 'القائمة')
+        label = re.sub(r'^[➕⚠️\s]+', '', label).split(' — ')[0]
+        try:
+            if not yt_token():
+                raise RuntimeError('لا إذن لحسابك في يوتيوب')
+            yt_mine('POST', 'playlistItems', part='snippet', body={'snippet': {
+                'playlistId': m.group(1), 'resourceId': {'kind': 'youtube#video', 'videoId': m.group(2)}}})
+            new, note = {'text': f'✅ {label}', 'callback_data': 'x'}, f'أُضيف إلى {label}'
+            n += 1
+        except Exception as e:
+            print(f'الضغطات: تعذّرت إضافة فيديو إلى «{label}»: {e}')
+            new, note = {'text': f'⚠️ {label} — أعد الضغط', 'callback_data': data}, f'تعذّرت الإضافة: {e}'
+        for row in markup['inline_keyboard']:
+            for i, b in enumerate(row):
+                if b.get('callback_data') == data:
+                    row[i] = new
+        tg_api('editMessageReplyMarkup', chat_id=chat, message_id=cq['message']['message_id'], reply_markup=markup)
+        tg_api('answerCallbackQuery', callback_query_id=cq['id'], text=note[:190])   # قديمٌ غالبًا فيُرفض، ولا بأس
+    if ups:   # تأكيد ما قُرئ حتّى لا يعود
+        tg_api('getUpdates', offset=ups[-1]['update_id'] + 1, timeout=0, allowed_updates=['callback_query'])
+        print(f'الضغطات: {len(ups)}، أُضيف {n} فيديو')
+
+
 def yt_subscriptions(who, key):
     """القنوات التي يشترك فيها صاحب القناة who (رابطها أو معرّفها UC… أو @اسمها)، وتلزم أن تكون اشتراكاته عامّة."""
     m = re.search(r'(UC[\w-]{22})', who)
@@ -313,13 +439,15 @@ READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr': read_filecr, 'car
 
 # ------------------------------------------------------------------ تيلغرام
 
-def tg_send(text, preview=False):
+def tg_send(text, preview=False, markup=None):
     token, chat = os.environ['TELEGRAM_TOKEN'], os.environ['TELEGRAM_CHAT_ID']
+    data = {'chat_id': chat, 'text': text[:4000], 'parse_mode': 'HTML',
+            'link_preview_options': json.dumps({'is_disabled': not preview})}
+    if markup:
+        data['reply_markup'] = json.dumps(markup)
     for _ in range(5):
         try:
-            j = requests.post(f'https://api.telegram.org/bot{token}/sendMessage', timeout=30, data={
-                'chat_id': chat, 'text': text[:4000], 'parse_mode': 'HTML',
-                'link_preview_options': json.dumps({'is_disabled': not preview})}).json()
+            j = requests.post(f'https://api.telegram.org/bot{token}/sendMessage', timeout=30, data=data).json()
         except Exception as e:
             print('send:', e)
             time.sleep(5)
@@ -365,6 +493,8 @@ def run(args):
     state.setdefault('groups', {})
     send = not (args.dry or args.probe)
     total = 0
+    if send:
+        handle_presses(cfg)
     for src in cfg['sources']:
         if not src.get('enabled', True) and not args.probe:
             continue
@@ -408,11 +538,11 @@ def run(args):
             continue
         fresh.reverse()  # الأقدم أوّلًا
         ok = True
-        if len(fresh) > MAX_SINGLE:
+        if len(fresh) > src.get('max_single', MAX_SINGLE):
             ok = tg_send(fmt_batch(src, fresh))
         else:
             for it in fresh:
-                ok = tg_send(fmt_item(src, it), preview=src.get('preview', False)) and ok
+                ok = tg_send(fmt_item(src, it), preview=src.get('preview', False), markup=yt_buttons(cfg, it)) and ok
         if not ok:
             print(f'  لم يُرسل كلّ جديد {sid}، فلن يُسجَّل حتّى يُرسل في الفحص القادم')
             continue
@@ -443,7 +573,7 @@ def send_recent(hours, dry=False):
     والمصدر الذي لا تاريخ فيه يُذكر في آخر رسالة."""
     cfg = load_json(CFG_PATH, None)
     cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat(timespec='seconds')
-    out = tg_send if not dry else (lambda t, preview=False: print('---\n' + t) or True)
+    out = tg_send if not dry else (lambda t, preview=False, markup=None: print('---\n' + t) or True)
     out(f'🕒 ما نُشر في آخر {hours_ar(hours)}')
     undated, total = [], 0
     for src in cfg['sources']:
@@ -463,11 +593,11 @@ def send_recent(hours, dry=False):
         recent = sorted((it for it in items if it.get('date', '') >= cutoff), key=lambda it: it['date'])
         print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
         total += len(recent)
-        if len(recent) > MAX_SINGLE:
+        if len(recent) > src.get('max_single', MAX_SINGLE):
             out(fmt_batch(src, recent))
         else:
             for it in recent:
-                out(fmt_item(src, it), preview=src.get('preview', False))
+                out(fmt_item(src, it), preview=src.get('preview', False), markup=yt_buttons(cfg, it))
     note = f'انتهى: {total} عنصرًا.'
     if undated:
         note += ('\nهذه المواقع لا تذكر وقت النشر، فلا يُعرف منها ما نُشر في ساعاتٍ بعينها، '

@@ -1,6 +1,7 @@
 {
+  "playlists": [],
   "sources": [
-    {"id": "youtube", "name": "يوتيوب", "type": "youtube", "preview": true, "fail_alert": 24},
+    {"id": "youtube", "name": "يوتيوب", "type": "youtube", "preview": true, "fail_alert": 24, "max_single": 60},
     {"id": "anikoto", "name": "Anikoto", "type": "anikoto",
      "url": "https://anikototv.to/filter?keyword=&type=&language%5B%5D=sub&sort=latest-updated"},
     {"id": "wco", "name": "WCO", "type": "rss", "url": "https://www.wco.tv/feed/"},
