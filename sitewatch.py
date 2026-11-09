@@ -431,7 +431,8 @@ def read_tvmaze(src):
 
 
 def read_page_links(src):
-    """صفحة عاديّة: روابطها التي تطابق نمطًا (pattern)، ومعها pages صفحةً إن ذُكرت."""
+    """صفحة عاديّة: روابطها التي تطابق نمطًا (pattern)، ومعها pages صفحةً إن ذُكرت.
+    title_sel: إن ذُكر أُخذ العنوان من هذا العنصر داخل الرابط، لا من نصّ الرابط كلّه."""
     from bs4 import BeautifulSoup
     r = get(src['url'])
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -446,7 +447,12 @@ def read_page_links(src):
     def collect(soup):
         n = 0
         for a in soup.select('a[href]'):
-            href, text = a['href'], clean(a.get_text())
+            href = a['href']
+            if src.get('title_sel'):
+                el = a.select_one(src['title_sel'])
+                text = clean(el.get_text()) if el else ''
+            else:
+                text = clean(a.get_text())
             if pat.search(href) and text and href not in seen:
                 seen.add(href)
                 out.append({'key': href, 'title': text, 'url': href})
