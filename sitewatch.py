@@ -282,7 +282,7 @@ def run(args):
             items = READERS[src['type']](src)
         except Exception as e:
             n = state['fail'].get(sid, 0) + 1
-            print(f'✗ {sid}: {type(e).__name__}: {str(e)[:200]}')
+            print(f'✗ {sid}: {type(e).__name__}: {str(e) if args.probe else str(e)[:200]}')
             if send:
                 state['fail'][sid] = n
                 if n == FAIL_ALERT:
