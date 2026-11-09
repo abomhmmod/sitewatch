@@ -197,8 +197,13 @@ def read_tvmaze(src):
 def read_page_links(src):
     """صفحة عاديّة: روابطها التي تطابق نمطًا. (للمواقع المحجوبة اليوم؛ تُجرَّب في --probe.)"""
     from bs4 import BeautifulSoup
-    soup = BeautifulSoup(get(src['url']).text, 'html.parser')
+    r = get(src['url'])
+    soup = BeautifulSoup(r.text, 'html.parser')
     pat = re.compile(src.get('pattern', '.'))
+    if not any(pat.search(a['href']) for a in soup.select('a[href]')):
+        sample = [a['href'] for a in soup.select('a[href]')][:12]
+        raise ValueError(f'لا روابط تطابق النمط. العنوان: {clean(soup.title.string if soup.title else "")!r}، '
+                         f'الرابط النهائيّ: {r.url}، الحجم: {len(r.text)}، أمثلة: {sample}')
     out, seen = [], set()
     for a in soup.select('a[href]'):
         href, text = a['href'], clean(a.get_text())
