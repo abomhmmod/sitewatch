@@ -178,6 +178,8 @@ def read_youtube(src):
     fails = [e for _, e in res if e]
     if len(fails) == len(ids):
         raise RuntimeError(f'كلّ القنوات أخفقت، أوّلها {fails[0]}')
+    if fails:
+        print(f'    يوتيوب: أخفقت {len(fails)} من {len(ids)} قناة، منها: {fails[:3]}')
     return [x for lst, _ in res for x in lst]
 
 
