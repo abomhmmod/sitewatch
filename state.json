@@ -46,16 +46,17 @@
    "https://wcopanel.cizgifilmlerizle.com/maebee-episode-23-mae-bee-and-the-shooting-star"
   ],
   "carateen": [
-   "https://carateen.tv/watch/sp/1197/94053507",
-   "https://carateen.tv/watch/sp/1197/58408411",
-   "https://carateen.tv/watch/sp/1197/94000749",
+   "https://carateen.tv/watch/sp/1197/23051945",
    "https://carateen.tv/watch/sp/1197/87985429",
+   "https://carateen.tv/watch/sp/1197/94053507",
+   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/69865726",
+   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/61692469/69068261",
-   "https://carateen.tv/watch/sp/1243/39589977",
-   "https://carateen.tv/watch/sp/1243/41597449",
    "https://carateen.tv/watch/sp/1243/31953160",
+   "https://carateen.tv/watch/sp/1243/41597449",
    "https://carateen.tv/watch/sp/1243/80409508",
+   "https://carateen.tv/watch/sp/1243/39589977",
    "https://carateen.tv/watch/sp/1195/61435449",
    "https://carateen.tv/watch/sp/61692515/23065747",
    "https://carateen.tv/watch/sp/61692515/71824908",
@@ -63,6 +64,14 @@
    "https://carateen.tv/watch/sp/61692496/74741105"
   ],
   "topcinema": [
+   "https://topcinemaa.vip/?p=259207",
+   "https://topcinemaa.vip/?p=259206",
+   "https://topcinemaa.vip/?p=259205",
+   "https://topcinemaa.vip/?p=259204",
+   "https://topcinemaa.vip/?p=259203",
+   "https://topcinemaa.vip/?p=259195",
+   "https://topcinemaa.vip/?p=259202",
+   "https://topcinemaa.vip/?p=259200",
    "https://topcinemaa.vip/?p=259201",
    "https://topcinemaa.vip/?p=259199",
    "https://topcinemaa.vip/?p=257928",
@@ -2123,6 +2132,7 @@
    "yt:video:UVpREFwsPrQ",
    "yt:video:GwUfONU1UPs",
    "yt:video:GgWj4JclmWQ",
+   "yt:video:YT5HZgA79Fk",
    "yt:video:Asat-1oLxEg",
    "yt:video:zIOzNHkPyM8",
    "yt:video:Ybv9CPoGI2k",
@@ -2137,7 +2147,6 @@
    "yt:video:uAVKc8AdtaY",
    "yt:video:DG6mVKH9VEI",
    "yt:video:8gF3jmBKb68",
-   "yt:video:y165uv7mWsY",
    "yt:video:yXZFmC6z0tc",
    "yt:video:LHEUDJshWKM",
    "yt:video:WOl9X6Dl8Wk",
@@ -3877,18 +3886,18 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-09T19:28:33",
+ "last_run": "2026-11-09T19:38:33",
  "last_new": {
-  "youtube": "2026-11-09T19:28:01+03:00",
+  "youtube": "2026-11-09T19:38:08+03:00",
   "filecr-mine": "2026-11-09T15:21:45+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-09T18:26:10+03:00",
   "stardima": "2026-11-09T14:20:14+03:00",
   "fitgirl": "2026-11-09T15:21:49+03:00",
-  "topcinema": "2026-11-09T19:28:19+03:00",
+  "topcinema": "2026-11-09T19:38:24+03:00",
   "mycima-movies": "2026-11-09T18:26:32+03:00",
   "wco": "2026-11-09T19:28:05+03:00",
-  "carateen": "2026-11-09T19:28:14+03:00"
+  "carateen": "2026-11-09T19:38:19+03:00"
  },
  "status_msg": 36,
  "off": [
