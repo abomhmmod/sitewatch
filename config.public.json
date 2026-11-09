@@ -6,6 +6,7 @@
      "url": "https://anikototv.to/filter?keyword=&type=&language%5B%5D=sub&sort=latest-updated"},
     {"id": "wco", "name": "WCO (كرتون)", "type": "rss", "url": "https://www.wco.tv/feed/", "pages_hours": 3,
      "series_list": "https://www.wco.tv/cartoon-list"},
+    {"id": "anime4up", "name": "انمي فور آب", "type": "rss", "url": "https://w1.anime4up.rest/episode/feed/", "pages_hours": 3},
     {"id": "carateen", "name": "كراتين", "type": "carateen", "url": "https://carateen.tv/"},
     {"id": "topcinema", "name": "توب سينما", "type": "rss", "url": "https://topcinemaa.com/feed/", "pages_hours": 3},
     {"id": "impractical-jokers", "name": "Impractical Jokers", "type": "tvmaze", "show_id": 1139,
