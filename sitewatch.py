@@ -287,14 +287,14 @@ def run(args):
             print(f'✗ {sid}: {type(e).__name__}: {str(e) if args.probe else str(e)[:200]}')
             if send:
                 state['fail'][sid] = n
-                if n == FAIL_ALERT:
+                if n == src.get('fail_alert', FAIL_ALERT):
                     tg_send(f"⚠️ لم أستطع فحص «{html.escape(src['name'])}» في آخر {n} محاولات "
                             f"({html.escape(type(e).__name__)}). سأستمرّ في المحاولة.")
             continue
         if items is None:
             print(f'– {sid}: لا إعداد بعد، تُخطّي')
             continue
-        if send and state['fail'].get(sid, 0) >= FAIL_ALERT:
+        if send and state['fail'].get(sid, 0) >= src.get('fail_alert', FAIL_ALERT):
             tg_send(f"✅ عاد فحص «{html.escape(src['name'])}» يعمل.")
         state['fail'].pop(sid, None)
 
