@@ -486,13 +486,15 @@ def fmt_item(src, it):
     return f"<b>{html.escape(src['name'])}</b>\n<a href=\"{html.escape(it['url'], True)}\">{html.escape(it['title'])}</a>"
 
 
-def fmt_batch(src, items):
-    lines = [f"<b>{html.escape(src['name'])}</b> — {len(items)} جديد"]
-    for it in items[:40]:
-        lines.append(f"• <a href=\"{html.escape(it['url'], True)}\">{html.escape(it['title'])}</a>")
-    if len(items) > 40:
-        lines.append(f'… و{len(items) - 40} غيرها')
-    return '\n'.join(lines)
+def fmt_batch(src, items, per=20):
+    """الجديد الكثير في رسائل، كلٌّ منها حتّى per عنصرًا، فلا يُختصر منه شيء (حدّ الرسالة في تيلغرام 4096 حرفًا)."""
+    parts = [items[i:i + per] for i in range(0, len(items), per)]
+    msgs = []
+    for n, part in enumerate(parts, 1):
+        head = f"<b>{html.escape(src['name'])}</b> — {len(items)} جديد" + (f' ({n}/{len(parts)})' if len(parts) > 1 else '')
+        lines = [head] + [f"• <a href=\"{html.escape(it['url'], True)}\">{html.escape(it['title'][:150])}</a>" for it in part]
+        msgs.append('\n'.join(lines))
+    return msgs
 
 
 # ------------------------------------------------------------------ التشغيل
@@ -556,7 +558,8 @@ def run(args):
         fresh.reverse()  # الأقدم أوّلًا
         ok = True
         if len(fresh) > src.get('max_single', MAX_SINGLE):
-            ok = tg_send(fmt_batch(src, fresh))
+            for m in fmt_batch(src, fresh):
+                ok = tg_send(m) and ok
         else:
             for it in fresh:
                 ok = tg_send(fmt_item(src, it), preview=src.get('preview', False), markup=yt_buttons(cfg, it)) and ok
@@ -611,7 +614,8 @@ def send_recent(hours, dry=False):
         print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
         total += len(recent)
         if len(recent) > src.get('max_single', MAX_SINGLE):
-            out(fmt_batch(src, recent))
+            for m in fmt_batch(src, recent):
+                out(m)
         else:
             for it in recent:
                 out(fmt_item(src, it), preview=src.get('preview', False), markup=yt_buttons(cfg, it))
