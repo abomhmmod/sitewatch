@@ -202,7 +202,7 @@ def read_page_links(src):
     pat = re.compile(src.get('pattern', '.'))
     if not any(pat.search(a['href']) for a in soup.select('a[href]')):
         host = re.sub(r'^https?://([^/]+).*', r'\1', r.url)
-        sample = list(dict.fromkeys(a['href'] for a in soup.select('a[href]') if host in a['href']))[10:40]
+        sample = list(dict.fromkeys(a['href'] for a in soup.select('a[href]') if host in a['href']))[-30:]
         raise ValueError(f'لا روابط تطابق النمط. العنوان: {clean(soup.title.string if soup.title else "")!r}، '
                          f'الرابط النهائيّ: {r.url}، الحجم: {len(r.text)}، أمثلة: {sample}')
     out, seen = [], set()
