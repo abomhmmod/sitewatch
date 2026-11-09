@@ -258,66 +258,14 @@ def my_playlists(cfg):
 
 
 def yt_buttons(cfg, it):
-    """أزرار «أضف إلى قائمة» تحت فيديو يوتيوب، أو None."""
+    """أزرار «أضف إلى قائمة» تحت فيديو يوتيوب، أو None. والضغطات يعالجها كلّ دقيقة apps-script/Code.gs
+    على حسابك في Google، لا هذا البرنامج."""
     if not it['key'].startswith('yt:video:'):
         return None
     vid = it['key'][9:]
     btns = [{'text': f'➕ {name}', 'callback_data': f'p:{pid}:{vid}'} for pid, name in my_playlists(cfg)
             if len(f'p:{pid}:{vid}'.encode()) <= 64]
     return {'inline_keyboard': [btns[i:i + 2] for i in range(0, len(btns), 2)]} if btns else None
-
-
-def tg_api(method, **data):
-    token = os.environ['TELEGRAM_TOKEN']
-    data = {k: json.dumps(v) if isinstance(v, (dict, list)) else v for k, v in data.items()}
-    try:
-        return requests.post(f'https://api.telegram.org/bot{token}/{method}', timeout=30, data=data).json()
-    except Exception as e:
-        return {'ok': False, 'description': str(e)}
-
-
-def handle_presses(cfg):
-    """يضيف الفيديوهات التي ضُغطت أزرارها منذ الفحص السابق إلى قوائمها، ويجعل الزرّ «✅»."""
-    chat = str(os.environ['TELEGRAM_CHAT_ID'])
-    j = tg_api('getUpdates', timeout=0, allowed_updates=['callback_query'])
-    if not j.get('ok'):
-        print('الضغطات: تعذّرت قراءتها:', j.get('description'))
-        return
-    ups = j.get('result') or []
-    done, n = set(), 0
-    for u in ups:
-        cq = u.get('callback_query')
-        if not cq or str((cq.get('message') or {}).get('chat', {}).get('id')) != chat:
-            continue
-        data = cq.get('data', '')
-        m = re.fullmatch(r'p:([\w-]+):([\w-]{11})', data)
-        if not m or data in done:
-            tg_api('answerCallbackQuery', callback_query_id=cq['id'])
-            continue
-        done.add(data)
-        markup = cq['message'].get('reply_markup') or {'inline_keyboard': []}
-        label = next((b['text'] for row in markup['inline_keyboard'] for b in row
-                      if b.get('callback_data') == data), 'القائمة')
-        label = re.sub(r'^[➕⚠️\s]+', '', label).split(' — ')[0]
-        try:
-            if not yt_token():
-                raise RuntimeError('لا إذن لحسابك في يوتيوب')
-            yt_mine('POST', 'playlistItems', part='snippet', body={'snippet': {
-                'playlistId': m.group(1), 'resourceId': {'kind': 'youtube#video', 'videoId': m.group(2)}}})
-            new, note = {'text': f'✅ {label}', 'callback_data': 'x'}, f'أُضيف إلى {label}'
-            n += 1
-        except Exception as e:
-            print(f'الضغطات: تعذّرت إضافة فيديو إلى «{label}»: {e}')
-            new, note = {'text': f'⚠️ {label} — أعد الضغط', 'callback_data': data}, f'تعذّرت الإضافة: {e}'
-        for row in markup['inline_keyboard']:
-            for i, b in enumerate(row):
-                if b.get('callback_data') == data:
-                    row[i] = new
-        tg_api('editMessageReplyMarkup', chat_id=chat, message_id=cq['message']['message_id'], reply_markup=markup)
-        tg_api('answerCallbackQuery', callback_query_id=cq['id'], text=note[:190])   # قديمٌ غالبًا فيُرفض، ولا بأس
-    if ups:   # تأكيد ما قُرئ حتّى لا يعود
-        tg_api('getUpdates', offset=ups[-1]['update_id'] + 1, timeout=0, allowed_updates=['callback_query'])
-        print(f'الضغطات: {len(ups)}، أُضيف {n} فيديو')
 
 
 def yt_subscriptions(who, key):
@@ -495,8 +443,6 @@ def run(args):
     state.setdefault('groups', {})
     send = not (args.dry or args.probe)
     total = 0
-    if send:
-        handle_presses(cfg)
     for src in cfg['sources']:
         if not src.get('enabled', True) and not args.probe:
             continue
