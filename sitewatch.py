@@ -38,7 +38,7 @@ UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.3
                     '(KHTML, like Gecko) Chrome/131.0 Safari/537.36',
       'Accept-Language': 'ar,en;q=0.8'}
 KEEP_KEYS = 600          # ما يُحفظ من مفاتيح كلّ مصدر
-MAX_SINGLE = 10          # إن زاد جديد مصدرٍ على هذا جُمع في رسالة واحدة
+MAX_SINGLE = 10          # إن زاد جديد يوتيوب على هذا (أو max_single) جُمع كرسائل المواقع
 FAIL_ALERT = 3           # تنبيه بعد هذا العدد من الإخفاقات المتتالية
 MAX_PLAYLISTS = 8        # أقصى عدد أزرار القوائم تحت الفيديو
 
@@ -385,7 +385,8 @@ def read_youtube(src):
                 items = yt_api(cid, key)
             else:
                 items = read_rss({'url': f'https://www.youtube.com/feeds/videos.xml?channel_id={cid}'})
-            return [dict(x, group=cid, title=f"{x['author']}: {x['title']}" if x.get('author') else x['title'])
+            return [dict(x, group=cid, vtitle=x['title'],
+                         title=f"{x['author']}: {x['title']}" if x.get('author') else x['title'])
                     for x in items], None
         except Exception as e:
             return [], f'#{pos}: {e}'
@@ -458,43 +459,251 @@ READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr
 
 # ------------------------------------------------------------------ تيلغرام
 
-def tg_send(text, preview=False, markup=None):
-    token, chat = os.environ['TELEGRAM_TOKEN'], os.environ['TELEGRAM_CHAT_ID']
-    data = {'chat_id': chat, 'text': text[:4000], 'parse_mode': 'HTML',
-            'link_preview_options': json.dumps({'is_disabled': not preview})}
-    if markup:
-        data['reply_markup'] = json.dumps(markup)
+def tg(method, **data):
+    """طلبٌ إلى واجهة تيلغرام، مع الانتظار إن طلبت ذلك (429)."""
+    token = os.environ['TELEGRAM_TOKEN']
+    data = {k: json.dumps(v) if isinstance(v, (dict, list, bool)) else v for k, v in data.items()}
     for _ in range(5):
         try:
-            j = requests.post(f'https://api.telegram.org/bot{token}/sendMessage', timeout=30, data=data).json()
+            j = requests.post(f'https://api.telegram.org/bot{token}/{method}', timeout=30, data=data).json()
         except Exception as e:
-            print('send:', e)
+            print(f'{method}:', e)
             time.sleep(5)
             continue
-        if j.get('ok'):
-            time.sleep(1.1)
-            return True
         ra = (j.get('parameters') or {}).get('retry_after')
-        if not ra:
-            print('send failed:', j)
-            return False
+        if j.get('ok') or not ra:
+            return j
         time.sleep(ra + 1)
-    return False
+    return {'ok': False, 'description': 'لم يُرسل بعد عدّة محاولات'}
 
 
-def fmt_item(src, it):
-    return f"<b>{html.escape(src['name'])}</b>\n<a href=\"{html.escape(it['url'], True)}\">{html.escape(it['title'])}</a>"
+def tg_send(text, preview=False, markup=None, silent=False):
+    data = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': text[:4096], 'parse_mode': 'HTML',
+            'link_preview_options': {'is_disabled': not preview}}
+    if markup:
+        data['reply_markup'] = markup
+    if silent:
+        data['disable_notification'] = True
+    j = tg('sendMessage', **data)
+    if not j.get('ok'):
+        print('send failed:', j)
+        return False
+    time.sleep(1.1)
+    return j['result']['message_id']
 
 
-def fmt_batch(src, items, per=20):
-    """الجديد الكثير في رسائل، كلٌّ منها حتّى per عنصرًا، فلا يُختصر منه شيء (حدّ الرسالة في تيلغرام 4096 حرفًا)."""
-    parts = [items[i:i + per] for i in range(0, len(items), per)]
-    msgs = []
-    for n, part in enumerate(parts, 1):
-        head = f"<b>{html.escape(src['name'])}</b> — {len(items)} جديد" + (f' ({n}/{len(parts)})' if len(parts) > 1 else '')
-        lines = [head] + [f"• <a href=\"{html.escape(it['url'], True)}\">{html.escape(it['title'][:150])}</a>" for it in part]
-        msgs.append('\n'.join(lines))
+def a(url, text):
+    return f'<a href="{html.escape(url, True)}">{html.escape(text, False)}</a>'
+
+
+EP_PATTERNS = [
+    re.compile(r'^(?P<s>.+?)[\s\-—:|]*(?:الحلقة|حلقة)\s*(?P<e>\d+)'),
+    re.compile(r'^(?P<s>.+?)\s+(?:Season\s+(?P<season>\d+)\s+)?Episode\s+(?P<e>\d+)', re.I),
+    re.compile(r'^(?P<s>.+?)\s+S(?P<season>\d+)E(?P<e>\d+)', re.I),
+]
+PREFIX = re.compile(r'^(?:انمي|أنمي|مسلسل|برنامج)\s+')
+FINAL = re.compile(r'ال[اأ]خيرة')
+
+
+def tidy(title):
+    """العنوان بلا «مسلسل/انمي» في أوّله ولا «مترجم اون لاين» في آخره."""
+    t = PREFIX.sub('', title)
+    t = re.sub(r'\s+(?:مترجم[ةه]?)?(?:\s*(?:اون|أون)\s+لاين)?\s*$', '', t)
+    return t.strip() or title
+
+
+def split_episode(title):
+    """(المسلسل، رقم الحلقة، تتمّة العنوان بعد «:» إن كانت) من عنوان حلقة، أو (None, None, '')."""
+    for pat in EP_PATTERNS:
+        m = pat.search(title)
+        if m:
+            name = PREFIX.sub('', m.group('s')).strip(' -—:|')
+            if m.groupdict().get('season'):
+                name += f" الموسم {int(m.group('season'))}"
+            if 'مدبلج' in title:
+                name += ' (مدبلج)'
+            rest = title[m.end():].strip()
+            return name, int(m.group('e')), rest if rest.startswith(':') else ''
+    return None, None, ''
+
+
+def ranges(nums):
+    nums, out = sorted(set(nums)), []
+    for n in nums:
+        if out and n == out[-1][1] + 1:
+            out[-1][1] = n
+        else:
+            out.append([n, n])
+    return '، '.join(f'{x}' if x == y else f'{x}–{y}' for x, y in out)
+
+
+def site_lines(items):
+    """أسطر رسالة الموقع: حلقات المسلسل الواحد في سطرٍ واحد، برابط أحدثها."""
+    groups, order = {}, []
+    for it in items:
+        name, ep, rest = split_episode(it['title'])
+        k = name or ('\0' + it['key'])
+        if k not in groups:
+            groups[k] = []
+            order.append(k)
+        groups[k].append((ep, rest, it))
+    lines = []
+    for k in order:
+        g = groups[k]
+        ep, rest, last = max(g, key=lambda x: x[0] or 0)
+        final = ' (الأخيرة)' if FINAL.search(last['title']) else ''
+        if ep is None:
+            lines.append('• ' + a(last['url'], tidy(last['title'])[:200]))
+        elif len(g) == 1:
+            lines.append(f"• {a(last['url'], k)} — الحلقة {ep}{html.escape(rest, False)}{final}")
+        else:
+            lines.append(f"• {a(last['url'], k)} — الحلقات {ranges(e for e, _, _ in g)}{final}")
+    return lines
+
+
+def times_ar(n):
+    return 'مرّة' if n == 1 else 'مرّتين' if n == 2 else f'{n} مرّات' if n <= 10 else f'{n} مرّة'
+
+
+def count_ar(n):
+    return 'جديدٌ واحد' if n == 1 else ('جديدان' if n == 2 else f'{n} جديدة' if n <= 10 else f'{n} جديدًا')
+
+
+def fmt_site(src, items, limit=3500):
+    """جديد الموقع في رسالةٍ واحدة (أو أكثر إن طال)، والأقدم أوّلًا."""
+    head = f"{src.get('icon', '🔔')} <b>{html.escape(src['name'])}</b> · {count_ar(len(items))}"
+    msgs, cur = [], head
+    for line in site_lines(items):
+        if len(cur) + len(line) + 1 > limit:
+            msgs.append(cur)
+            cur = f"{src.get('icon', '🔔')} <b>{html.escape(src['name'])}</b> (تابع)"
+        cur += '\n' + line
+    msgs.append(cur)
     return msgs
+
+
+def iso_secs(d):
+    m = re.fullmatch(r'P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', d or '')
+    if not m:
+        return None
+    dd, h, mi, se = (int(x or 0) for x in m.groups())
+    return ((dd * 24 + h) * 60 + mi) * 60 + se
+
+
+def clock(secs):
+    h, r = divmod(secs, 3600)
+    return f'{h}:{r // 60:02d}:{r % 60:02d}' if h else f'{r // 60}:{r % 60:02d}'
+
+
+def yt_details(items):
+    """مدّة كلّ فيديو، وهل هو بثٌّ أو عرضٌ قادم أو Short: {المعرّف: {...}}. وحدةٌ لكلّ 50 فيديو."""
+    key = os.environ.get('YT_API_KEY', '').strip()
+    ids = [it['key'][9:] for it in items if it['key'].startswith('yt:video:')]
+    out = {}
+    if not key or not ids:
+        return out
+    try:
+        for i in range(0, len(ids), 50):
+            j = yt_get('videos', key, part='contentDetails,snippet,liveStreamingDetails', id=','.join(ids[i:i + 50]))
+            for v in j.get('items', []):
+                secs = iso_secs(v.get('contentDetails', {}).get('duration'))
+                live = v.get('snippet', {}).get('liveBroadcastContent', 'none')
+                start = (v.get('liveStreamingDetails') or {}).get('scheduledStartTime')
+                short = False
+                if secs and secs <= 180 and live == 'none':   # Short: رابط /shorts/ يُفتح ولا يُحوَّل
+                    try:
+                        r = requests.head(f"https://www.youtube.com/shorts/{v['id']}", headers=UA, timeout=15,
+                                          allow_redirects=False)
+                        short = r.status_code == 200
+                    except requests.RequestException:
+                        pass
+                out[v['id']] = {'secs': secs, 'live': live, 'start': start, 'short': short}
+    except Exception as e:
+        print('    تفاصيل الفيديوهات:', e)
+    return out
+
+
+def fmt_video(src, it, d):
+    """رسالة فيديو يوتيوب: القناة ونوع الفيديو، ثمّ العنوان، ثمّ مدّته أو موعده."""
+    d = d or {}
+    tag = {'live': ' · 🔴 بثٌّ مباشر', 'upcoming': ' · 📅 عرضٌ قادم'}.get(d.get('live'), ' · Short' if d.get('short') else '')
+    lines = [f"{src.get('icon', '📺')} <b>{html.escape(it.get('author') or src['name'])}</b>{tag}",
+             a(it['url'], it.get('vtitle') or it['title'])]
+    if d.get('live') == 'upcoming' and d.get('start'):
+        st = datetime.fromisoformat(d['start'].replace('Z', '+00:00')).astimezone()
+        lines.append(f'🕒 يبدأ {day_time(st)}')
+    elif d.get('secs'):
+        lines.append(f"⏱ {clock(d['secs'])}")
+    return '\n'.join(lines)
+
+
+DAYS = ['الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد']
+
+
+def day_time(t):
+    """«14:05» إن كان اليوم، و«أمس 14:05»، وإلّا «الخميس 14:05» في الأسبوع، أو التاريخ."""
+    now = datetime.now(t.tzinfo)
+    days = (now.date() - t.date()).days
+    hm = t.strftime('%H:%M')
+    if days == 0:
+        return hm
+    if days == 1:
+        return f'أمس {hm}'
+    if days == -1:
+        return f'غدًا {hm}'
+    if -6 <= days < 7:
+        return f'{DAYS[t.weekday()]} {hm}'
+    return t.strftime('%Y-%m-%d ') + hm
+
+
+def send_new(cfg, src, items, out=None):
+    """يرسل جديد مصدرٍ (الأقدم أوّلًا): فيديوهات يوتيوب كلٌّ في رسالة بأزرارها، وغيرها رسالةٌ للموقع."""
+    out = out or tg_send
+    ok = True
+    if src['type'] == 'youtube' and len(items) <= src.get('max_single', MAX_SINGLE):
+        det = yt_details(items)
+        for it in items:
+            ok = bool(out(fmt_video(src, it, det.get(it['key'][9:])), preview=True, markup=yt_buttons(cfg, it))) and ok
+    else:
+        one = len(items) == 1 and src.get('preview', False)
+        for m in fmt_site(src, items):
+            ok = bool(out(m, preview=one)) and ok
+    return ok
+
+
+def update_status(cfg, state, results):
+    """رسالة «حال المواقع» المثبّتة: تُعدَّل بصمت بعد كلّ فحص، وتُرسل وتُثبَّت إن لم تكن."""
+    lines = [f'📌 <b>حال المواقع</b>', f'آخر فحص: {day_time(datetime.now().astimezone())}', '']
+    for src in cfg['sources']:
+        if not src.get('enabled', True):
+            continue
+        sid, r = src['id'], results.get(src['id'])
+        name = f"{src.get('icon', '🔔')} {html.escape(src['name'])}"
+        last = state.get('last_new', {}).get(sid)
+        since = f' · آخر جديد {day_time(datetime.fromisoformat(last))}' if last else ''
+        if r is None:
+            continue
+        if r[0] == 'new':
+            lines.append(f'{name} — <b>{count_ar(r[1])}</b>')
+        elif r[0] == 'none':
+            lines.append(f'{name} — لا جديد{since}')
+        elif r[0] == 'seed':
+            lines.append(f'{name} — أوّل فحص: سُجّل ما فيه')
+        else:
+            lines.append(f'⚠️ {html.escape(src["name"])} — تعذّر فحصه آخر {times_ar(r[1])}{since}')
+    text = '\n'.join(lines)
+    chat = os.environ['TELEGRAM_CHAT_ID']
+    mid = state.get('status_msg')
+    if mid:
+        j = tg('editMessageText', chat_id=chat, message_id=mid, text=text, parse_mode='HTML',
+               link_preview_options={'is_disabled': True})
+        if j.get('ok') or 'not modified' in j.get('description', ''):
+            return
+        print('رسالة الحال: تعذّر تعديلها، فتُرسل من جديد:', j.get('description'))
+    mid = tg_send(text, silent=True)
+    if mid:
+        state['status_msg'] = mid
+        tg('pinChatMessage', chat_id=chat, message_id=mid, disable_notification=True)
 
 
 # ------------------------------------------------------------------ التشغيل
@@ -512,8 +721,10 @@ def run(args):
     state.setdefault('seen', {})
     state.setdefault('fail', {})
     state.setdefault('groups', {})
+    state.setdefault('last_new', {})
     send = not (args.dry or args.probe)
     total = 0
+    results = {}
     for src in cfg['sources']:
         if not src.get('enabled', True) and not args.probe:
             continue
@@ -524,6 +735,7 @@ def run(args):
         except Exception as e:
             n = state['fail'].get(sid, 0) + 1
             print(f'✗ {sid}: {type(e).__name__}: {str(e) if args.probe else str(e)[:200]}')
+            results[sid] = ('fail', n)
             if send:
                 state['fail'][sid] = n
                 if n == src.get('fail_alert', FAIL_ALERT):
@@ -553,16 +765,13 @@ def run(args):
         if args.probe or args.dry:
             for it in (items if args.probe else fresh)[:3 if args.probe else 50]:
                 print('    ', it['title'][:110], '|', it['url'][:90])
+        results[sid] = ('seed', 0) if not seen_list else ('new', len(fresh)) if fresh else ('none', 0)
         if not send:
             continue
         fresh.reverse()  # الأقدم أوّلًا
-        ok = True
-        if len(fresh) > src.get('max_single', MAX_SINGLE):
-            for m in fmt_batch(src, fresh):
-                ok = tg_send(m) and ok
-        else:
-            for it in fresh:
-                ok = tg_send(fmt_item(src, it), preview=src.get('preview', False), markup=yt_buttons(cfg, it)) and ok
+        ok = send_new(cfg, src, fresh) if fresh else True
+        if fresh and ok:
+            state['last_new'][sid] = datetime.now().astimezone().isoformat(timespec='seconds')
         if not ok:
             print(f'  لم يُرسل كلّ جديد {sid}، فلن يُسجَّل حتّى يُرسل في الفحص القادم')
             continue
@@ -573,6 +782,7 @@ def run(args):
             state['groups'][sid] = sorted(groups)
     if send:
         state['last_run'] = datetime.now().isoformat(timespec='seconds')
+        update_status(cfg, state, results)
         tmp = STATE_PATH.with_suffix('.tmp')
         tmp.write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding='utf-8')
         tmp.replace(STATE_PATH)
@@ -593,7 +803,8 @@ def send_recent(hours, dry=False):
     والمصدر الذي لا تاريخ فيه يُذكر في آخر رسالة."""
     cfg = load_json(CFG_PATH, None)
     cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat(timespec='seconds')
-    out = tg_send if not dry else (lambda t, preview=False, markup=None: print('---\n' + t) or True)
+    out = tg_send if not dry else (lambda t, preview=False, markup=None, silent=False:
+                                   print('---\n' + t + (f'\n[أزرار: {len(markup["inline_keyboard"])} صفّ]' if markup else '')) or True)
     out(f'🕒 ما نُشر في آخر {hours_ar(hours)}')
     undated, total = [], 0
     for src in cfg['sources']:
@@ -613,12 +824,8 @@ def send_recent(hours, dry=False):
         recent = sorted((it for it in items if it.get('date', '') >= cutoff), key=lambda it: it['date'])
         print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
         total += len(recent)
-        if len(recent) > src.get('max_single', MAX_SINGLE):
-            for m in fmt_batch(src, recent):
-                out(m)
-        else:
-            for it in recent:
-                out(fmt_item(src, it), preview=src.get('preview', False), markup=yt_buttons(cfg, it))
+        if recent:
+            send_new(cfg, src, recent, out)
     note = f'انتهى: {total} عنصرًا.'
     if undated:
         note += ('\nهذه المواقع لا تذكر وقت النشر، فلا يُعرف منها ما نُشر في ساعاتٍ بعينها، '
