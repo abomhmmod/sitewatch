@@ -115,13 +115,16 @@ def read_anikoto(src):
 
 def read_filecr_pages(src):
     """برامج بعينها في filecr (المثبّتة على حاسوبك): صفحة كلّ برنامج، والمفتاح البرنامج مع تاريخ تحديثه.
+    وكلّ عنصرٍ في programs اسمُ صفحته (فهو من ويندوز)، أو قسمها واسمها مثل "android/snaptube".
     والبرنامج المضاف حديثًا يُسجَّل تحديثه الحاليّ بلا إرسال."""
     def data(url, **params):
         m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', get(url, params=params).text, re.S)
         return json.loads(m.group(1))['props']['pageProps'] if m else {}
 
-    def page(slug):
-        link = f'https://filecr.com/windows/{slug}/'
+    def page(entry):
+        path = entry if '/' in entry else f'windows/{entry}'
+        slug = path.rsplit('/', 1)[1]
+        link = f'https://filecr.com/{path}/'
         try:
             post = data(link).get('post')
         except requests.HTTPError as e:   # بعض الصفحات خاصّة (404)، لكنّها تظهر في البحث
@@ -133,7 +136,7 @@ def read_filecr_pages(src):
             link = 'https://filecr.com/search/?q=' + requests.utils.quote(q)
         if not post or not post.get('updated_at'):
             raise ValueError(f'{slug}: لا بيانات البرنامج في الصفحة')
-        return {'key': f"{slug}@{post['updated_at']}", 'group': slug, 'title': clean(post['title']),
+        return {'key': f"{entry}@{post['updated_at']}", 'group': entry, 'title': clean(post['title']),
                 'url': link, 'date': utc(post['updated_at'])}
 
     def safe(slug):
@@ -377,7 +380,9 @@ def read_tvmaze(src):
     out = []
     for e in eps:
         if e.get('airstamp') and e['airstamp'] <= now:
-            out.append({'key': str(e['id']), 'url': src.get('link') or e['url'], 'date': utc(e['airstamp']),
+            url = (src['episode_link'].format(season=e['season'], number=e.get('number') or 0)
+                   if src.get('episode_link') else src.get('link') or e['url'])
+            out.append({'key': str(e['id']), 'url': url, 'date': utc(e['airstamp']),
                         'title': f"{show['name']} S{e['season']:02d}E{(e.get('number') or 0):02d}: {clean(e['name'])} ({e['airdate']})"})
     return out[::-1]
 
