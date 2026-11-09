@@ -1,0 +1,38 @@
+name: send-recent
+
+# يرسل إلى تيلغرام ما نُشر في آخر عددٍ من الساعات، من كلّ مصدرٍ يذكر وقت النشر. لا يغيّر state.json.
+on:
+  workflow_dispatch:
+    inputs:
+      hours:
+        description: 'عدد الساعات'
+        default: '3'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  recent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: |
+          pip install -q -r requirements.txt
+          python -m playwright install --only-shell chromium
+      - name: send
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          YT_CHANNELS: ${{ secrets.YT_CHANNELS }}
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          HOURS: ${{ inputs.hours }}
+        run: python sitewatch.py --recent "$HOURS"

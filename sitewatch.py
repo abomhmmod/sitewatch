@@ -21,7 +21,8 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import requests
@@ -53,8 +54,25 @@ def clean(t):
     return re.sub(r'\s+', ' ', html.unescape(t or '')).strip()
 
 
+def utc(t):
+    """تاريخ النشر بتوقيت UTC بصيغة ISO، من أيّ صيغةٍ شائعة؛ أو '' إن لم يُعرف."""
+    t = clean(t)
+    if not t:
+        return ''
+    try:
+        d = datetime.fromisoformat(t.replace('Z', '+00:00').replace(' ', 'T', 1))
+    except ValueError:
+        try:
+            d = parsedate_to_datetime(t)
+        except (TypeError, ValueError):
+            return ''
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=timezone.utc)
+    return d.astimezone(timezone.utc).isoformat(timespec='seconds')
+
+
 # ------------------------------------------------------------------ أنواع المصادر
-# كلّ قارئ يعيد قائمة عناصر، الأحدث أوّلًا: {'key', 'title', 'url'} وقد يزيد 'note'.
+# كلّ قارئ يعيد قائمة عناصر، الأحدث أوّلًا: {'key', 'title', 'url'}، و'date' (UTC) إن كان للموقع تاريخ نشر.
 
 def read_rss(src):
     root = ET.fromstring(get(src['url']).content)
@@ -62,13 +80,14 @@ def read_rss(src):
     for it in root.iter('item'):
         link = clean(it.findtext('link'))
         out.append({'key': clean(it.findtext('guid')) or link,
-                    'title': clean(it.findtext('title')), 'url': link})
+                    'title': clean(it.findtext('title')), 'url': link, 'date': utc(it.findtext('pubDate'))})
     A = '{http://www.w3.org/2005/Atom}'
     for it in root.iter(A + 'entry'):
         a = it.find(A + 'link')
         link = a.get('href') if a is not None else ''
         out.append({'key': clean(it.findtext(A + 'id')) or link, 'title': clean(it.findtext(A + 'title')),
-                    'url': link, 'author': clean(it.findtext(f'{A}author/{A}name'))})
+                    'url': link, 'author': clean(it.findtext(f'{A}author/{A}name')),
+                    'date': utc(it.findtext(A + 'published') or it.findtext(A + 'updated'))})
     return out
 
 
@@ -103,7 +122,7 @@ def read_filecr(src):
             cat = it['categories']['primary']['slug_permanent']
             out.append({'key': f"{it['slug']}@{it.get('updated_at', '')}",
                         'title': f"{names.get(sec, sec)}: {clean(it['title'])}",
-                        'url': f"https://filecr.com/{cat}/{it['slug']}/"})
+                        'url': f"https://filecr.com/{cat}/{it['slug']}/", 'date': utc(it.get('updated_at'))})
     out.sort(key=lambda x: x['key'].rsplit('@', 1)[1], reverse=True)
     return out
 
@@ -151,7 +170,7 @@ def read_github_releases(src):
         return [{'key': f"{repo['full_name']}#{r['id']}", 'group': repo['full_name'],
                  'title': f"{repo['full_name']}: {clean(r.get('name') or r['tag_name'])}"
                           + (' (تجريبيّ)' if r.get('prerelease') else ''),
-                 'url': r['html_url'], 'date': r.get('published_at') or ''}
+                 'url': r['html_url'], 'date': utc(r.get('published_at'))}
                 for r in rel if not r.get('draft')]
 
     with ThreadPoolExecutor(6) as ex:
@@ -175,7 +194,8 @@ def yt_api(cid, key):
         vid = sn.get('resourceId', {}).get('videoId')
         if vid:
             out.append({'key': f'yt:video:{vid}', 'url': f'https://www.youtube.com/watch?v={vid}',
-                        'title': clean(sn.get('title')), 'author': clean(sn.get('channelTitle'))})
+                        'title': clean(sn.get('title')), 'author': clean(sn.get('channelTitle')),
+                        'date': utc(sn.get('publishedAt'))})
     return out
 
 
@@ -188,6 +208,7 @@ def read_youtube(src):
     key = os.environ.get('YT_API_KEY', '').strip()
 
     def feed(cid):
+        pos = ids.index(cid) + 1   # رقم القناة في القائمة، لا معرّفها: سجلّ التشغيل عامّ
         try:
             if key:
                 items = yt_api(cid, key)
@@ -196,7 +217,7 @@ def read_youtube(src):
             return [dict(x, group=cid, title=f"{x['author']}: {x['title']}" if x.get('author') else x['title'])
                     for x in items], None
         except Exception as e:
-            return [], f'{cid}: {e}'
+            return [], f'#{pos}: {e}'
 
     with ThreadPoolExecutor(8) as ex:
         res = list(ex.map(feed, ids))
@@ -204,7 +225,7 @@ def read_youtube(src):
     if len(fails) == len(ids):
         raise RuntimeError(f'كلّ القنوات أخفقت، أوّلها {fails[0]}')
     if fails:
-        print(f'    يوتيوب: أخفقت {len(fails)} من {len(ids)} قناة، منها: {fails[:3]}')
+        print(f'    يوتيوب: أخفقت {len(fails)} من {len(ids)} قناة (رقمها في القائمة): {fails[:20]}')
     return [x for lst, _ in res for x in lst]
 
 
@@ -216,7 +237,7 @@ def read_tvmaze(src):
     out = []
     for e in eps:
         if e.get('airstamp') and e['airstamp'] <= now:
-            out.append({'key': str(e['id']), 'url': src.get('link') or e['url'],
+            out.append({'key': str(e['id']), 'url': src.get('link') or e['url'], 'date': utc(e['airstamp']),
                         'title': f"{show['name']} S{e['season']:02d}E{(e.get('number') or 0):02d}: {clean(e['name'])} ({e['airdate']})"})
     return out[::-1]
 
@@ -364,6 +385,52 @@ def run(args):
         print(f'أُرسل {total} عنصرًا.')
 
 
+def hours_ar(h):
+    h = int(h) if float(h).is_integer() else h
+    if h == 1:
+        return 'ساعة'
+    if h == 2:
+        return 'ساعتين'
+    return f'{h} ساعات' if isinstance(h, int) and 3 <= h <= 10 else f'{h} ساعة'
+
+
+def send_recent(hours, dry=False):
+    """يرسل ما نُشر في آخر «hours» ساعة من كلّ مصدرٍ له تاريخ نشر، ولا يمسّ state.json.
+    والمصدر الذي لا تاريخ فيه يُذكر في آخر رسالة."""
+    cfg = load_json(CFG_PATH, None)
+    cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat(timespec='seconds')
+    out = tg_send if not dry else (lambda t, preview=False: print('---\n' + t) or True)
+    out(f'🕒 ما نُشر في آخر {hours_ar(hours)}')
+    undated, total = [], 0
+    for src in cfg['sources']:
+        if not src.get('enabled', True):
+            continue
+        try:
+            items = READERS[src['type']](src)
+        except Exception as e:
+            print(f"✗ {src['id']}: {type(e).__name__}: {str(e)[:200]}")
+            out(f"⚠️ «{html.escape(src['name'])}»: تعذّر فحصه الآن.")
+            continue
+        if items is None:
+            continue
+        if not any(it.get('date') for it in items):
+            undated.append(src['name'])
+            continue
+        recent = sorted((it for it in items if it.get('date', '') >= cutoff), key=lambda it: it['date'])
+        print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
+        total += len(recent)
+        if len(recent) > MAX_SINGLE:
+            out(fmt_batch(src, recent))
+        else:
+            for it in recent:
+                out(fmt_item(src, it), preview=src.get('preview', False))
+    note = f'انتهى: {total} عنصرًا.'
+    if undated:
+        note += ('\nهذه المواقع لا تذكر وقت النشر، فلا يُعرف منها ما نُشر في ساعاتٍ بعينها، '
+                 'ويصلك جديدها في الفحص المعتاد كلّ ساعة: ' + '، '.join(undated))
+    out(note)
+
+
 def main():
     for s in (sys.stdout, sys.stderr):
         s.reconfigure(encoding='utf-8', errors='replace')
@@ -371,9 +438,14 @@ def main():
     ap.add_argument('--dry', action='store_true')
     ap.add_argument('--probe', action='store_true')
     ap.add_argument('--test', action='store_true')
+    ap.add_argument('--recent', type=float, metavar='HOURS',
+                    help='أرسل ما نُشر في آخر عددٍ من الساعات (مع --dry: اطبعه فقط)')
     args = ap.parse_args()
     if args.test:
         sys.exit(0 if tg_send('✅ بوت المواقع يعمل.') else 1)
+    if args.recent:
+        send_recent(args.recent, args.dry)
+        return
     run(args)
 
 

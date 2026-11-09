@@ -42,6 +42,7 @@
 ## الاستعمال
 - **تشغيل فوريّ:** تبويب Actions ← sitewatch ← Run workflow.
 - **رسالة اختبار:** مثله، مع علامة على «أرسل رسالة اختبار فقط».
+- **ما نُشر في آخر ساعات:** Actions ← send-recent ← Run workflow، واكتب عدد الساعات. يرسل من كلّ مصدرٍ يذكر وقت النشر، ولا يغيّر الحالة. وAnikoto وكراتين وEgyDead لا تذكر وقت النشر.
 - **فحص المصادر:** Actions ← probe-sources ← Run workflow. يطبع ما يجده في كلّ مصدر، دون إرسال ودون تغيير الحالة.
 - **الإيقاف:** Actions ← sitewatch ← ⋯ ← Disable workflow. **وللإعادة:** Enable workflow، ثمّ Run workflow مرّةً واحدة.
 
