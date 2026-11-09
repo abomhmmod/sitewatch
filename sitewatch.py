@@ -460,6 +460,8 @@ def read_page_links(src):
         return n
 
     collect(soup)
+    if not out:     # روابط تطابق النمط لكن بلا عنوان (تغيّر شكل الصفحة): فحصٌ متعذّر، لا «لا جديد»
+        raise ValueError(f'روابط تطابق النمط لكن بلا عنوان (title_sel={src.get("title_sel")!r})، فلعلّ شكل الصفحة تغيّر')
     # pages: صفحاتٌ تالية تُقرأ أيضًا (url/page/2/ …)، فلا يضيع ما يُنشر دفعةً واحدة أكثر من صفحة
     for n in range(2, src.get('pages', 1) + 1):
         try:
@@ -472,9 +474,47 @@ def read_page_links(src):
     return out
 
 
+def read_stardima(src):
+    """ستارديما: صفحة «الجديد» فيها آخر حلقةٍ من كلّ عمل فقط. فالبطاقة الجديدة تُفتح صفحتها لمعرفة موسمها،
+    ثمّ تُؤخذ من قائمة حلقات الموسم (/series/season/<id>) كلّ حلقةٍ بعد آخر حلقةٍ معروفة من العمل،
+    فلا يضيع ما نُشر من حلقاتٍ عدّة بين فحصين. وفي أوّل فحص (لا معروف) تكفي البطاقات."""
+    cards = read_page_links(src)
+    known = src.get('_known') or set()
+    if not known:
+        return cards
+    out = []
+    for card in cards:
+        m = re.search(r'/tvshow/([^/]+)/play/(\d+)$', card['url'])
+        if not m or same(card['key']) in known:
+            out.append(card)
+            continue
+        show = m.group(1)
+        mine = {int(x) for k in known for x in re.findall(rf'/tvshow/{re.escape(show)}/play/(\d+)$', k)}
+        try:
+            sid = re.search(r'data-initial-season-id="(\d+)"', get(card['url']).text).group(1)
+            base = re.sub(r'^(https?://[^/]+).*', r'\1', card['url'])
+            eps = get(f'{base}/series/season/{sid}', headers={'Accept': 'application/json',
+                                                              'X-Requested-With': 'XMLHttpRequest'}).json()['episodes']
+        except Exception as e:
+            print(f"    stardima: تعذّرت قائمة حلقات {card['title']}: {type(e).__name__}، فتُرسل البطاقة وحدها")
+            out.append(card)
+            continue
+        ids = [e['id'] for e in eps]
+        last = max((i for i, x in enumerate(ids) if x in mine), default=-1)
+        name = re.sub(r'\s*-\s*حلقة\s*\d+\s*$', '', card['title'])
+        new = [e for e in eps[last + 1:] if e['id'] <= int(m.group(2))][-100:] or [None]
+        for e in reversed(new):          # الأحدث أوّلًا، كترتيب الصفحة
+            if e is None:
+                out.append(card)
+                continue
+            url = re.sub(r'/play/\d+$', f"/play/{e['id']}", card['url'])
+            out.append({'key': url, 'title': f"{name} - حلقة {e['episode_number']}", 'url': url})
+    return out
+
+
 READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr_pages, 'carateen': read_carateen,
            'github_releases': read_github_releases, 'youtube': read_youtube, 'tvmaze': read_tvmaze,
-           'page_links': read_page_links}
+           'page_links': read_page_links, 'stardima': read_stardima}
 
 
 # ------------------------------------------------------------------ تيلغرام
@@ -747,16 +787,21 @@ def run(args):
     state.setdefault('fail', {})
     state.setdefault('groups', {})
     state.setdefault('last_new', {})
+    state.setdefault('off', [])
     send = not (args.dry or args.probe)
     total = 0
     results = {}
     for src in cfg['sources']:
-        if not src.get('enabled', True) and not args.probe:
-            continue
         sid = src['id']
+        if not src.get('enabled', True) and not args.probe:
+            if send and sid not in state['off']:
+                state['off'].append(sid)     # فإن أُعيد يُسجَّل ما فيه بلا إرسال، فلا يصل قديمه
+            continue
+        seen_list = state['seen'].get(sid, [])
+        seen = {same(k) for k in seen_list}
         t0 = time.time()
         try:
-            items = READERS[src['type']](src)
+            items = READERS[src['type']]({**src, '_known': seen})
         except Exception as e:
             n = state['fail'].get(sid, 0) + 1
             print(f'✗ {sid}: {type(e).__name__}: {str(e) if args.probe else str(e)[:200]}')
@@ -774,23 +819,27 @@ def run(args):
             tg_send(f"✅ عاد فحص «{html.escape(src['name'])}» يعمل.")
         state['fail'].pop(sid, None)
 
-        seen_list = state['seen'].get(sid, [])
-        seen = {same(k) for k in seen_list}
+        # العنصر الواحد بعنوانين للموقع (أثناء انتقاله) عنصرٌ واحد
+        uniq = set()
+        items = [it for it in items if not (same(it['key']) in uniq or uniq.add(same(it['key'])))]
         groups = set(state['groups'].get(sid, []))
         fresh = [it for it in items if same(it['key']) not in seen]
         if 'group' in (items[0] if items else {}):
             # مجموعةٌ جديدة (قناة أو مستودع أُضيف): تُسجَّل عناصرها بلا إرسال
             fresh = [it for it in fresh if it['group'] in groups]
             groups |= {it['group'] for it in items}
-        if not seen_list:
-            fresh = []          # أوّل فحصٍ للمصدر: تسجيلٌ بلا إرسال
+        revived = sid in state['off'] and src.get('enabled', True)    # مصدرٌ أُعيد بعد إيقافه: ما فاته قديم
+        seed = not seen_list or revived
+        if seed:
+            fresh = []          # أوّل فحصٍ للمصدر، أو أوّل فحصٍ بعد إعادته: تسجيلٌ بلا إرسال
         dt = time.time() - t0
-        print(f'✓ {sid}: {len(items)} عنصرًا، الجديد {len(fresh)}' + (' (أوّل فحص: تسجيل فقط)' if not seen_list else '')
+        print(f'✓ {sid}: {len(items)} عنصرًا، الجديد {len(fresh)}'
+              + (' (أُعيد بعد إيقافه: تسجيل فقط)' if revived else ' (أوّل فحص: تسجيل فقط)' if seed else '')
               + f' [{dt:.1f}s]')
         if args.probe or args.dry:
             for it in (items if args.probe else fresh)[:3 if args.probe else 50]:
                 print('    ', it['title'][:110], '|', it['url'][:90])
-        results[sid] = ('seed', 0) if not seen_list else ('new', len(fresh)) if fresh else ('none', 0)
+        results[sid] = ('seed', 0) if seed else ('new', len(fresh)) if fresh else ('none', 0)
         if not send:
             continue
         fresh.reverse()  # الأقدم أوّلًا
@@ -801,11 +850,12 @@ def run(args):
             print(f'  لم يُرسل كلّ جديد {sid}، فلن يُسجَّل حتّى يُرسل في الفحص القادم')
             continue
         total += len(fresh)
-        now_keys = {same(it['key']) for it in items}
-        keys = [it['key'] for it in items] + [k for k in seen_list if same(k) not in now_keys]
+        keys = [it['key'] for it in items] + [k for k in seen_list if same(k) not in uniq]
         state['seen'][sid] = keys[:max(KEEP_KEYS, len(items))]
         if groups:
             state['groups'][sid] = sorted(groups)
+        if revived:
+            state['off'].remove(sid)
     if send:
         state['last_run'] = datetime.now().isoformat(timespec='seconds')
         update_status(cfg, state, results)
