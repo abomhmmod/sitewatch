@@ -113,23 +113,43 @@ def read_anikoto(src):
     return out
 
 
-def read_filecr(src):
-    """الصفحة الرئيسيّة لـ filecr: أقسامها في بيانات الصفحة (__NEXT_DATA__)، والمفتاح البرنامج مع تاريخ تحديثه."""
-    h = get(src['url']).text
-    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', h, re.S)
-    if not m:
-        raise ValueError('لا بيانات __NEXT_DATA__ في الصفحة')
-    props = json.loads(m.group(1))['props']['pageProps']
-    names = src.get('section_names', {})
-    out = []
-    for sec in src.get('sections', props.keys()):
-        for it in props.get(sec) or []:
-            cat = it['categories']['primary']['slug_permanent']
-            out.append({'key': f"{it['slug']}@{it.get('updated_at', '')}",
-                        'title': f"{names.get(sec, sec)}: {clean(it['title'])}",
-                        'url': f"https://filecr.com/{cat}/{it['slug']}/", 'date': utc(it.get('updated_at'))})
-    out.sort(key=lambda x: x['key'].rsplit('@', 1)[1], reverse=True)
-    return out
+def read_filecr_pages(src):
+    """برامج بعينها في filecr (المثبّتة على حاسوبك): صفحة كلّ برنامج، والمفتاح البرنامج مع تاريخ تحديثه.
+    والبرنامج المضاف حديثًا يُسجَّل تحديثه الحاليّ بلا إرسال."""
+    def data(url, **params):
+        m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', get(url, params=params).text, re.S)
+        return json.loads(m.group(1))['props']['pageProps'] if m else {}
+
+    def page(slug):
+        link = f'https://filecr.com/windows/{slug}/'
+        try:
+            post = data(link).get('post')
+        except requests.HTTPError as e:   # بعض الصفحات خاصّة (404)، لكنّها تظهر في البحث
+            if e.response is None or e.response.status_code != 404:
+                raise
+            q = slug.replace('-', ' ')
+            post = next((x for x in data('https://filecr.com/search/', q=q).get('posts', [])
+                         if x.get('slug') == slug), None)
+            link = 'https://filecr.com/search/?q=' + requests.utils.quote(q)
+        if not post or not post.get('updated_at'):
+            raise ValueError(f'{slug}: لا بيانات البرنامج في الصفحة')
+        return {'key': f"{slug}@{post['updated_at']}", 'group': slug, 'title': clean(post['title']),
+                'url': link, 'date': utc(post['updated_at'])}
+
+    def safe(slug):
+        try:
+            return page(slug), None
+        except Exception as e:
+            return None, f'{slug}: {e}'
+
+    with ThreadPoolExecutor(6) as ex:
+        res = list(ex.map(safe, src['programs']))
+    fails = [e for _, e in res if e]
+    if len(fails) == len(res):
+        raise RuntimeError(f'كلّ البرامج أخفقت، أوّلها {fails[0]}')
+    if fails:
+        print(f'    FileCR: أخفق {len(fails)} من {len(res)}: {fails[:10]}')
+    return sorted((it for it, _ in res if it), key=lambda x: x['date'], reverse=True)
 
 
 def read_carateen(src):
@@ -382,7 +402,7 @@ def read_page_links(src):
     return out
 
 
-READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr': read_filecr, 'carateen': read_carateen,
+READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr_pages, 'carateen': read_carateen,
            'github_releases': read_github_releases, 'youtube': read_youtube, 'tvmaze': read_tvmaze,
            'page_links': read_page_links}
 

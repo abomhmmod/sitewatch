@@ -9,9 +9,9 @@
     {"id": "topcinema", "name": "توب سينما", "type": "rss", "url": "https://topcinemaa.com/feed/"},
     {"id": "impractical-jokers", "name": "Impractical Jokers", "type": "tvmaze", "show_id": 1139,
      "link": "https://telepisodes.org/tv-series/impractical-jokers/"},
-    {"id": "filecr", "name": "FileCR", "type": "filecr", "url": "https://filecr.com/us-en/",
-     "sections": ["windows", "pcGames", "android"],
-     "section_names": {"windows": "ويندوز", "pcGames": "ألعاب", "android": "أندرويد", "mac": "ماك"}},
+    {"id": "filecr-mine", "name": "FileCR", "type": "filecr_pages",
+     "_note": "البرامج المثبّتة على حاسوب المستخدم: اسم صفحة كلّ برنامج في filecr.com/windows/<slug>/",
+     "programs": ["adobe-photoshop-download-0081", "internet-download-manager", "microsoft-office-2021-2024", "wemod", "7-zip", "mkvtoolnix", "subtitle-edit", "qbittorrent", "honeyview", "yt-dlp", "git-for-windows", "node-js", "python-for-windows", "windows-powershell", "microsoft-powertoys-for-windows-10", "marti-climent-wingetui", "megasync-desktop", "protonvpn", "google-chrome", "mozilla-firefox", "microsoft-edge", "discord", "telegram-desktop", "whatsapp-for-pc", "google-gemini-for-windows", "nvidia-app", "steam", "epic-games-store"]},
     {"id": "fitgirl", "name": "FitGirl Repacks", "type": "rss", "url": "https://fitgirl-repacks.site/feed/"},
     {"id": "github-stars", "name": "GitHub", "type": "github_releases", "user": "abomhmmod"},
 
