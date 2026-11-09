@@ -79,13 +79,14 @@ def utc(t):
 # ------------------------------------------------------------------ أنواع المصادر
 # كلّ قارئ يعيد قائمة عناصر، الأحدث أوّلًا: {'key', 'title', 'url'}، و'date' (UTC) إن كان للموقع تاريخ نشر.
 
-def read_rss(src):
-    root = ET.fromstring(get(src['url']).content)
+def rss_page(url):
+    root = ET.fromstring(get(url).content)
     out = []
     for it in root.iter('item'):
         link = clean(it.findtext('link'))
         out.append({'key': clean(it.findtext('guid')) or link,
-                    'title': clean(it.findtext('title')), 'url': link, 'date': utc(it.findtext('pubDate'))})
+                    'title': clean(it.findtext('title')), 'url': link, 'date': utc(it.findtext('pubDate')),
+                    'cats': [clean(c.text).lower() for c in it.findall('category') if c.text]})
     A = '{http://www.w3.org/2005/Atom}'
     for it in root.iter(A + 'entry'):
         a = it.find(A + 'link')
@@ -94,6 +95,33 @@ def read_rss(src):
                     'url': link, 'author': clean(it.findtext(f'{A}author/{A}name')),
                     'date': utc(it.findtext(A + 'published') or it.findtext(A + 'updated'))})
     return out
+
+
+def read_rss(src):
+    """خلاصة RSS أو Atom. ومعها اختياريًّا:
+    pages_hours: تُقرأ صفحات الخلاصة الأقدم (?paged=2…) حتّى تبلغ ما نُشر قبل هذه الساعات، فلا يضيع ما يُنشر دفعةً
+                 واحدة أكثر من صفحة (حتّى max_pages صفحات).
+    series_list: صفحةٌ فيها أسماء المسلسلات المطلوبة (مثل قائمة الكرتون في WCO)، فلا يبقى إلّا ما تصنيفه منها."""
+    out = rss_page(src['url'])
+    if src.get('pages_hours'):
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=src['pages_hours'])).isoformat()
+        sep = '&' if '?' in src['url'] else '?'
+        for n in range(2, src.get('max_pages', 10) + 1):
+            dates = [it['date'] for it in out if it.get('date')]
+            if not dates or min(dates) < cutoff:
+                break
+            more = rss_page(f"{src['url']}{sep}paged={n}")
+            if not more:
+                break
+            out += more
+    if src.get('series_list'):
+        h = get(src['series_list']).text
+        want = {clean(t).lower() for t in re.findall(r'<li><a href="/anime/[^"]+" title="([^"]+)"', h)}
+        if not want:
+            raise ValueError('قائمة المسلسلات فارغة')
+        out = [it for it in out if any(c in want for c in it.get('cats', []))]
+    seen = set()
+    return [seen.add(it['key']) or it for it in out if it['key'] not in seen]
 
 
 def read_anikoto(src):
