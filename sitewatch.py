@@ -735,6 +735,11 @@ def load_json(p, default):
         return default
 
 
+def same(key):
+    """مفتاح العنصر بلا اسم الموقع: المواقع تغيّر عناوينها (topcinemaa.com ← .vip)، فلا يُعدّ قديمها جديدًا."""
+    return re.sub(r'^https?://[^/]+', '', key)
+
+
 def run(args):
     cfg = load_json(CFG_PATH, None)
     state = load_json(STATE_PATH, {})
@@ -770,9 +775,9 @@ def run(args):
         state['fail'].pop(sid, None)
 
         seen_list = state['seen'].get(sid, [])
-        seen = set(seen_list)
+        seen = {same(k) for k in seen_list}
         groups = set(state['groups'].get(sid, []))
-        fresh = [it for it in items if it['key'] not in seen]
+        fresh = [it for it in items if same(it['key']) not in seen]
         if 'group' in (items[0] if items else {}):
             # مجموعةٌ جديدة (قناة أو مستودع أُضيف): تُسجَّل عناصرها بلا إرسال
             fresh = [it for it in fresh if it['group'] in groups]
@@ -796,7 +801,8 @@ def run(args):
             print(f'  لم يُرسل كلّ جديد {sid}، فلن يُسجَّل حتّى يُرسل في الفحص القادم')
             continue
         total += len(fresh)
-        keys = [it['key'] for it in items] + [k for k in seen_list if k not in {it['key'] for it in items}]
+        now_keys = {same(it['key']) for it in items}
+        keys = [it['key'] for it in items] + [k for k in seen_list if same(k) not in now_keys]
         state['seen'][sid] = keys[:max(KEEP_KEYS, len(items))]
         if groups:
             state['groups'][sid] = sorted(groups)
