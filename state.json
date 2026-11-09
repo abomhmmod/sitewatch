@@ -46,10 +46,10 @@
   ],
   "carateen": [
    "https://carateen.tv/watch/sp/61692469/69068261",
-   "https://carateen.tv/watch/sp/1243/31953160",
-   "https://carateen.tv/watch/sp/1243/80409508",
-   "https://carateen.tv/watch/sp/1243/41597449",
    "https://carateen.tv/watch/sp/1243/39589977",
+   "https://carateen.tv/watch/sp/1243/80409508",
+   "https://carateen.tv/watch/sp/1243/31953160",
+   "https://carateen.tv/watch/sp/1243/41597449",
    "https://carateen.tv/watch/sp/1195/61435449",
    "https://carateen.tv/watch/sp/61692515/23065747",
    "https://carateen.tv/watch/sp/61692515/71824908",
@@ -631,6 +631,7 @@
    "https://a1.egydead.media/episodes/where-the-mask-ends-e30/"
   ],
   "youtube": [
+   "yt:video:hFo3b9OCBAA",
    "yt:video:Rct0W_FG_As",
    "yt:video:m7uCr1GLXU4",
    "yt:video:uw7fMywFnG4",
@@ -645,7 +646,6 @@
    "yt:video:_aeRFFIM1LE",
    "yt:video:evOjP1RHo6Y",
    "yt:video:Jbvv4bZQbfo",
-   "yt:video:8ZMQBR6LZnc",
    "yt:video:I7IaqRJMi9w",
    "yt:video:U6I5PkZjWZU",
    "yt:video:ODDJXGY_1kQ",
@@ -676,6 +676,7 @@
    "yt:video:fF-R3GttpKs",
    "yt:video:nMry10irWEg",
    "yt:video:I11gBvOaTzI",
+   "yt:video:DTs4YHy07gE",
    "yt:video:3f1ot-ny_to",
    "yt:video:Inu8fHCRY8c",
    "yt:video:UciqZY-0r5k",
@@ -690,7 +691,6 @@
    "yt:video:4kit24NpNns",
    "yt:video:T11Zj8NL_KI",
    "yt:video:bgJAQzfxwXc",
-   "yt:video:LIIu7Q7pnFQ",
    "yt:video:LeOQh702nRE",
    "yt:video:dR0CbfNxM-s",
    "yt:video:dlyLBacvgzU",
@@ -2662,6 +2662,7 @@
    "yt:video:AxnxkAtoA0o",
    "yt:video:Pq0z0ryFjsA",
    "yt:video:kv890YyGK5g",
+   "yt:video:cZhn_FwFpnI",
    "yt:video:C5L72WZJE5w",
    "yt:video:5IVbPObxTIw",
    "yt:video:ReXPwEv42H4",
@@ -2676,7 +2677,6 @@
    "yt:video:TFSfLab3qzc",
    "yt:video:ZCx3w_rdtfA",
    "yt:video:uFBWIk0jZN4",
-   "yt:video:6p9adX5HXEk",
    "yt:video:5yyvmPFFJ64",
    "yt:video:KRJtPfQ1W6U",
    "yt:video:C8ZA1JSeiF4",
@@ -2692,6 +2692,7 @@
    "yt:video:aE1OxpT1qMM",
    "yt:video:VRRyaC-_Q0w",
    "yt:video:WVnOMthoRDg",
+   "yt:video:RgUaTER-wSQ",
    "yt:video:fmXpQPyLtWE",
    "yt:video:YiHUkkXcIkY",
    "yt:video:r6AOJdQMC3Y",
@@ -2706,7 +2707,6 @@
    "yt:video:UD36KF0baK8",
    "yt:video:0whyE-Vs3gA",
    "yt:video:RHVUmPdJi2s",
-   "yt:video:dEprVe6dnI4",
    "yt:video:sJMVbKZuR0Q",
    "yt:video:vfmVLNqYqLU",
    "yt:video:nxN5eQnhyFQ",
@@ -2782,6 +2782,7 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:T6Bs63Lgvws",
    "yt:video:x2W4KeAKY4Q",
    "yt:video:LfHQNuvXRvQ",
    "yt:video:MfPIKBlgd7I",
@@ -2796,7 +2797,6 @@
    "yt:video:hdpv26BsHQ0",
    "yt:video:OSsrxnBOrwk",
    "yt:video:KU6jDBJXhVk",
-   "yt:video:lN5mjCmQkj4",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
    "yt:video:Fk8XaK32jNQ",
@@ -3547,6 +3547,7 @@
    "https://mycima.gdn/%d9%85%d8%b4%d8%a7%d9%87%d8%af%d8%a9-%d9%81%d9%8a%d9%84%d9%85-%d8%b5%d9%82%d8%b1-%d9%88%d9%83%d9%86%d8%a7%d8%b1%d9%8a%d8%a7-2026/"
   ],
   "stardima": [
+   "https://www.stardima.com/tvshow/6af19f63a4f27/play/105440",
    "https://www.stardima.com/tvshow/6996d0e598265/play/105392",
    "https://www.stardima.com/tvshow/6944495edc71f/play/105324",
    "https://www.stardima.com/tvshow/video-250/play/105323",
@@ -3827,12 +3828,13 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-09T13:19:12",
+ "last_run": "2026-11-09T14:20:26",
  "last_new": {
-  "youtube": "2026-11-09T13:18:50+03:00",
+  "youtube": "2026-11-09T14:20:01+03:00",
   "filecr-mine": "2026-11-09T13:19:07+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-09T13:18:54+03:00"
+  "anime4up": "2026-11-09T13:18:54+03:00",
+  "stardima": "2026-11-09T14:20:14+03:00"
  },
  "status_msg": 36
 }
