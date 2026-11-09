@@ -537,19 +537,136 @@ def tg(method, **data):
     return {'ok': False, 'description': 'لم يُرسل بعد عدّة محاولات'}
 
 
-def tg_send(text, preview=False, markup=None, silent=False):
-    data = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': text[:4096], 'parse_mode': 'HTML',
+def tg_post(chat, text, preview=False, markup=None, silent=False, thread=None):
+    """رسالةٌ إلى محادثة، أو إلى موضوعٍ فيها؛ ويعيد ردّ تيلغرام كما هو."""
+    data = {'chat_id': chat, 'text': text[:4096], 'parse_mode': 'HTML',
             'link_preview_options': {'is_disabled': not preview}}
+    if thread:
+        data['message_thread_id'] = thread
     if markup:
         data['reply_markup'] = markup
     if silent:
         data['disable_notification'] = True
     j = tg('sendMessage', **data)
+    if j.get('ok'):
+        time.sleep(1.1)
+    return j
+
+
+def tg_send(text, preview=False, markup=None, silent=False):
+    """رسالةٌ إلى محادثتك الخاصّة مع البوت."""
+    j = tg_post(os.environ['TELEGRAM_CHAT_ID'], text, preview, markup, silent)
     if not j.get('ok'):
         print('send failed:', j)
         return False
-    time.sleep(1.1)
     return j['result']['message_id']
+
+
+THREAD_GONE = re.compile(r'thread not found|TOPIC_DELETED|TOPIC_CLOSED|TOPIC_ID_INVALID', re.I)
+GROUP_GONE = re.compile(r'chat not found|not enough rights|not a forum|have no rights|CHAT_ADMIN_REQUIRED|'
+                        r'administrator rights|CHAT_WRITE_FORBIDDEN|bot is not a member|group chat was upgraded', re.I)
+
+
+class Group:
+    """مجموعة المواضيع (السرّ TELEGRAM_GROUP_ID): موضوعٌ لكلّ موقع يصنعه البوت، و«حال المواقع» والتنبيهات في General.
+    فإن لم تُضبط، أو رفضت الإرسال، وصل كلّ شيءٍ إلى المحادثة الخاصّة كما كان، مع تنبيهٍ واحد."""
+
+    def __init__(self, state, create=True):
+        self.id = os.environ.get('TELEGRAM_GROUP_ID', '').strip()
+        self.create = create     # send-recent لا يحفظ state.json، فلا يصنع مواضيع: ما لا موضوع له يذهب إلى General
+        self.skip = False        # رفضت المجموعة في هذا الفحص، فلا تُجرَّب ثانيةً حتّى الفحص القادم
+        g = state.get('group') or {}
+        if g.get('id') != self.id:   # مجموعةٌ أخرى: مواضيعها غير مواضيع القديمة
+            g = {'id': self.id, 'topics': {}, 'unpin': []}
+        if create:
+            state['group'] = g
+        self.g = g
+
+    @property
+    def on(self):
+        return bool(self.id) and not self.skip
+
+    def refused(self, j):
+        """هل الخطأ من المجموعة نفسها (طُرد البوت، أو لا صلاحيّة، أو ليست منتدى)؟ فيُنبَّه مرّةً ويُرجع إلى الخاصّ."""
+        why = j.get('description', '')
+        if j.get('error_code') != 403 and not GROUP_GONE.search(why):
+            return False
+        print('المجموعة رفضت:', why)
+        self.skip = True
+        if not self.g.get('down'):
+            self.g['down'] = True
+            tg_send(f'⚠️ مجموعة المواضيع رفضت الإرسال ({html.escape(why[:150])})، '
+                    'فصار الجديد يصلك هنا حتّى تُصلَح. أعد البوت مشرفًا فيها بصلاحيّة إدارة المواضيع.')
+        return True
+
+    def worked(self):
+        if self.g.pop('down', None):
+            tg_send('✅ عادت مجموعة المواضيع تعمل، فصار الجديد يصل إليها.')
+
+    def topic(self, src):
+        """رقم موضوع الموقع (يُصنع إن لم يكن)، أو None لـ General، أو False إن رفضت المجموعة."""
+        sid = src['id']
+        if sid in self.g['topics'] or not self.create:
+            return self.g['topics'].get(sid)
+        j = tg('createForumTopic', chat_id=self.id, name=f"{src.get('icon', '🔔')} {src['name']}"[:128])
+        if not j.get('ok'):
+            if self.refused(j):
+                return False
+            print(f'تعذّر صنع موضوع {sid}:', j.get('description'))
+            return None
+        self.g['topics'][sid] = j['result']['message_thread_id']
+        self.g['unpin'].append(sid)       # تيلغرام يثبّت أوّل رسالةٍ في الموضوع الجديد، فيُلغى تثبيتها بعدها
+        return self.g['topics'][sid]
+
+    def ensure_topics(self, cfg):
+        """مواضيع كلّ المواقع المفعّلة، بترتيب الإعداد، فتظهر كلّها من أوّل فحص."""
+        for src in cfg['sources']:
+            if self.on and src.get('enabled', True):
+                self.topic(src)
+
+    def send(self, src, text, preview=False, markup=None, silent=False):
+        """جديد الموقع إلى موضوعه؛ ويعيد رقم الرسالة أو False كما تفعل tg_send."""
+        for attempt in (1, 2):
+            if not self.on:
+                break
+            tid = self.topic(src)
+            if tid is False:
+                break
+            j = tg_post(self.id, text, preview, markup, silent, thread=tid)
+            if j.get('ok'):
+                self.worked()
+                if tid and src['id'] in self.g['unpin']:
+                    tg('unpinAllForumTopicMessages', chat_id=self.id, message_thread_id=tid)
+                    self.g['unpin'].remove(src['id'])
+                return j['result']['message_id']
+            if attempt == 1 and tid and THREAD_GONE.search(j.get('description', '')):
+                print(f'موضوع {src["id"]} حُذف، فيُصنع من جديد')
+                self.g['topics'].pop(src['id'], None)
+                continue
+            if self.refused(j):
+                break
+            print('send failed:', j)
+            return False
+        return tg_send(text, preview, markup, silent)
+
+    def general(self, text, silent=False):
+        """رسالةٌ إلى General في المجموعة، أو إلى الخاصّ إن لم تكن."""
+        if self.on:
+            j = tg_post(self.id, text, silent=silent)
+            if j.get('ok'):
+                self.worked()
+                return j['result']['message_id']
+            if not self.refused(j):
+                print('send failed:', j)
+                return False
+        return tg_send(text, silent=silent)
+
+    def alert(self, text):
+        """تنبيهٌ إلى الخاصّ وإلى General معًا."""
+        ok = tg_send(text)
+        if self.on:
+            self.refused(tg_post(self.id, text))
+        return ok
 
 
 def a(url, text):
@@ -731,7 +848,7 @@ def send_new(cfg, src, items, out=None):
     return ok
 
 
-def update_status(cfg, state, results):
+def update_status(cfg, state, results, grp):
     """رسالة «حال المواقع» المثبّتة: تُعدَّل بصمت بعد كلّ فحص، وتُرسل وتُثبَّت إن لم تكن."""
     lines = [f'📌 <b>حال المواقع</b>', f'آخر فحص: {day_time(datetime.now().astimezone())}', '']
     for src in cfg['sources']:
@@ -752,17 +869,26 @@ def update_status(cfg, state, results):
         else:
             lines.append(f'⚠️ {html.escape(src["name"])} — تعذّر فحصه آخر {times_ar(r[1])}{since}')
     text = '\n'.join(lines)
-    chat = os.environ['TELEGRAM_CHAT_ID']
-    mid = state.get('status_msg')
-    if mid:
+    # في General من المجموعة إن كانت، وإلّا في الخاصّ؛ وإن انتقلت حُذفت القديمة
+    private = os.environ['TELEGRAM_CHAT_ID']
+    chat = grp.id if grp.on else private
+    mid, old = state.get('status_msg'), str(state.get('status_chat') or private)
+    if mid and old == str(chat):
         j = tg('editMessageText', chat_id=chat, message_id=mid, text=text, parse_mode='HTML',
                link_preview_options={'is_disabled': True})
         if j.get('ok') or 'not modified' in j.get('description', ''):
             return
         print('رسالة الحال: تعذّر تعديلها، فتُرسل من جديد:', j.get('description'))
-    mid = tg_send(text, silent=True)
-    if mid:
-        state['status_msg'] = mid
+    elif mid and not grp.skip:      # انتقلت إلى المجموعة أو منها (لا لرفضٍ عابر في هذا الفحص): تُحذف القديمة
+        if not tg('deleteMessage', chat_id=old, message_id=mid).get('ok'):
+            tg('unpinChatMessage', chat_id=old, message_id=mid)
+    j = tg_post(chat, text, silent=True)
+    if not j.get('ok') and chat != private and grp.refused(j):
+        chat = private
+        j = tg_post(chat, text, silent=True)
+    if j.get('ok'):
+        mid = j['result']['message_id']
+        state['status_msg'], state['status_chat'] = mid, str(chat)
         tg('pinChatMessage', chat_id=chat, message_id=mid, disable_notification=True)
 
 
@@ -789,6 +915,9 @@ def run(args):
     state.setdefault('last_new', {})
     state.setdefault('off', [])
     send = not (args.dry or args.probe)
+    grp = Group(state)
+    if send:
+        grp.ensure_topics(cfg)
     total = 0
     results = {}
     for src in cfg['sources']:
@@ -809,14 +938,14 @@ def run(args):
             if send:
                 state['fail'][sid] = n
                 if n == src.get('fail_alert', FAIL_ALERT):
-                    tg_send(f"⚠️ لم أستطع فحص «{html.escape(src['name'])}» في آخر {n} محاولات "
+                    grp.alert(f"⚠️ لم أستطع فحص «{html.escape(src['name'])}» في آخر {n} محاولات "
                             f"({html.escape(type(e).__name__)}). سأستمرّ في المحاولة.")
             continue
         if items is None:
             print(f'– {sid}: لا إعداد بعد، تُخطّي')
             continue
         if send and state['fail'].get(sid, 0) >= src.get('fail_alert', FAIL_ALERT):
-            tg_send(f"✅ عاد فحص «{html.escape(src['name'])}» يعمل.")
+            grp.alert(f"✅ عاد فحص «{html.escape(src['name'])}» يعمل.")
         state['fail'].pop(sid, None)
 
         # العنصر الواحد بعنوانين للموقع (أثناء انتقاله) عنصرٌ واحد
@@ -843,7 +972,7 @@ def run(args):
         if not send:
             continue
         fresh.reverse()  # الأقدم أوّلًا
-        ok = send_new(cfg, src, fresh) if fresh else True
+        ok = send_new(cfg, src, fresh, lambda t, **k: grp.send(src, t, **k)) if fresh else True
         if fresh and ok:
             state['last_new'][sid] = datetime.now().astimezone().isoformat(timespec='seconds')
         if not ok:
@@ -858,7 +987,7 @@ def run(args):
             state['off'].remove(sid)
     if send:
         state['last_run'] = datetime.now().isoformat(timespec='seconds')
-        update_status(cfg, state, results)
+        update_status(cfg, state, results, grp)
         tmp = STATE_PATH.with_suffix('.tmp')
         tmp.write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding='utf-8')
         tmp.replace(STATE_PATH)
@@ -879,8 +1008,10 @@ def send_recent(hours, dry=False):
     والمصدر الذي لا تاريخ فيه يُذكر في آخر رسالة."""
     cfg = load_json(CFG_PATH, None)
     cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat(timespec='seconds')
-    out = tg_send if not dry else (lambda t, preview=False, markup=None, silent=False:
-                                   print('---\n' + t + (f'\n[أزرار: {len(markup["inline_keyboard"])} صفّ]' if markup else '')) or True)
+    grp = Group(load_json(STATE_PATH, {}), create=False)     # مواضيع المواقع من state.json، وGeneral للعناوين
+    show = (lambda t, preview=False, markup=None, silent=False:
+            print('---\n' + t + (f'\n[أزرار: {len(markup["inline_keyboard"])} صفّ]' if markup else '')) or True)
+    out = show if dry else grp.general
     out(f'🕒 ما نُشر في آخر {hours_ar(hours)}')
     undated, total = [], 0
     for src in cfg['sources']:
@@ -901,7 +1032,7 @@ def send_recent(hours, dry=False):
         print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
         total += len(recent)
         if recent:
-            send_new(cfg, src, recent, out)
+            send_new(cfg, src, recent, show if dry else (lambda t, s=src, **k: grp.send(s, t, **k)))
     note = f'انتهى: {total} عنصرًا.'
     if undated:
         note += ('\nهذه المواقع لا تذكر وقت النشر، فلا يُعرف منها ما نُشر في ساعاتٍ بعينها، '
@@ -920,7 +1051,13 @@ def main():
                     help='أرسل ما نُشر في آخر عددٍ من الساعات (مع --dry: اطبعه فقط)')
     args = ap.parse_args()
     if args.test:
-        sys.exit(0 if tg_send('✅ بوت المواقع يعمل.') else 1)
+        ok = bool(tg_send('✅ بوت المواقع يعمل.'))
+        grp = Group({}, create=False)
+        if grp.id:      # والمجموعة: رسالةٌ في General
+            j = tg_post(grp.id, '✅ بوت المواقع يعمل في مجموعة المواضيع.')
+            print('المجموعة:', 'تعمل' if j.get('ok') else j.get('description'))
+            ok = bool(j.get('ok')) and ok
+        sys.exit(0 if ok else 1)
     if args.recent:
         send_recent(args.recent, args.dry)
         return

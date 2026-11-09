@@ -44,8 +44,16 @@ function poll() {
 function handle_(cq, done) {
   if (!cq || !cq.message) return;
   const chat = cq.message.chat;
-  // الأزرار لا تكون إلّا في رسائل البوت إليك، ومع ذلك: محادثةٌ خاصّة، والضاغط صاحبها
-  if (chat.type !== 'private' || cq.from.id !== chat.id) return;
+  // الأزرار في رسائل البوت إليك: في المحادثة الخاصّة يُقبل ضغط صاحبها، وفي مجموعة المواضيع ضغط مُنشئها وحده
+  if (chat.type === 'private') {
+    if (cq.from.id !== chat.id) return;
+  } else {
+    const mem = tg_('getChatMember', { chat_id: chat.id, user_id: cq.from.id });
+    if (!mem.ok || mem.result.status !== 'creator') {
+      tg_('answerCallbackQuery', { callback_query_id: cq.id, text: 'هذه الأزرار لصاحب المجموعة وحده' });
+      return;
+    }
+  }
   const m = /^p:([\w-]+):([\w-]{11})$/.exec(cq.data || '');
   if (!m || done[cq.data]) { tg_('answerCallbackQuery', { callback_query_id: cq.id }); return; }
   done[cq.data] = true;
