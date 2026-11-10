@@ -91,15 +91,15 @@
   ],
   "carateen": [
    "https://carateen.tv/watch/sp/61692484/30462040",
-   "https://carateen.tv/watch/sp/61692503/67141571",
-   "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692503/79169722",
+   "https://carateen.tv/watch/sp/61692503/93533014",
+   "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/94053507",
    "https://carateen.tv/watch/sp/1197/58408411",
-   "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/94000749",
+   "https://carateen.tv/watch/sp/1197/69865726",
+   "https://carateen.tv/watch/sp/1197/94053507",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
    "https://carateen.tv/watch/sp/1243/31953160",
@@ -4358,7 +4358,7 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-10T06:41:15",
+ "last_run": "2026-11-10T07:03:45",
  "last_new": {
   "youtube": "2026-11-10T04:39:00+03:00",
   "filecr-mine": "2026-11-09T15:21:45+03:00",
@@ -4394,7 +4394,8 @@
    "mycima-series": 12,
    "mycima-movies": 13,
    "fitgirl": 14,
-   "github-stars": 15
+   "github-stars": 15,
+   "youtube-shorts": 83
   },
   "unpin": [
    "anikoto",
@@ -4402,7 +4403,8 @@
    "impractical-jokers",
    "filecr-mine",
    "mycima-series",
-   "mycima-movies"
+   "mycima-movies",
+   "youtube-shorts"
   ]
  },
  "status_chat": "-1003928536381"
