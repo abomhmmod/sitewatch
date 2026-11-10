@@ -1,7 +1,8 @@
 {
   "playlists": "all",
   "sources": [
-    {"id": "youtube", "icon": "📺", "name": "يوتيوب", "type": "youtube", "preview": true, "fail_alert": 24, "max_single": 60},
+    {"id": "youtube", "icon": "📺", "name": "يوتيوب", "type": "youtube", "preview": true, "fail_alert": 24, "max_single": 60,
+     "shorts": {"id": "youtube-shorts", "icon": "📱", "name": "يوتيوب · Shorts"}},
     {"id": "anikoto", "icon": "🍥", "name": "Anikoto", "type": "anikoto",
      "url": "https://anikototv.to/filter?keyword=&type=&language%5B%5D=sub&sort=latest-updated"},
     {"id": "wco", "icon": "🧸", "name": "WCO (كرتون)", "type": "rss", "url": "https://www.wco.tv/feed/", "pages_hours": 3,

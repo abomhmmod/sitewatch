@@ -619,10 +619,12 @@ class Group:
         return self.g['topics'][sid]
 
     def ensure_topics(self, cfg):
-        """مواضيع كلّ المواقع المفعّلة، بترتيب الإعداد، فتظهر كلّها من أوّل فحص."""
+        """مواضيع كلّ المواقع المفعّلة، بترتيب الإعداد، فتظهر كلّها من أوّل فحص (ومعها موضوع Shorts يوتيوب)."""
         for src in cfg['sources']:
-            if self.on and src.get('enabled', True):
-                self.topic(src)
+            if src.get('enabled', True):
+                for s in (src, shorts_of(src)):
+                    if s and self.on:
+                        self.topic(s)
 
     def send(self, src, text, preview=False, markup=None, silent=False):
         """جديد الموقع إلى موضوعه؛ ويعيد رقم الرسالة أو False كما تفعل tg_send."""
@@ -833,18 +835,40 @@ def day_time(t):
     return t.strftime('%Y-%m-%d ') + hm
 
 
+def shorts_of(src):
+    """موضوع Shorts يوتيوب (إعداد «shorts» في مصدر يوتيوب): وجهة إرسالٍ فقط، ومفاتيحه وحاله في مصدر يوتيوب نفسه."""
+    s = src.get('shorts') if src.get('type') == 'youtube' else None
+    if not s:
+        return None
+    return {'id': s.get('id', src['id'] + '-shorts'), 'icon': s.get('icon', '📱'),
+            'name': s.get('name', src['name'] + ' · Shorts'), 'type': 'youtube'}
+
+
 def send_new(cfg, src, items, out=None):
-    """يرسل جديد مصدرٍ (الأقدم أوّلًا): فيديوهات يوتيوب كلٌّ في رسالة بأزرارها، وغيرها رسالةٌ للموقع."""
-    out = out or tg_send
+    """يرسل جديد مصدرٍ (الأقدم أوّلًا) بـ out(وجهة، نصّ): فيديوهات يوتيوب كلٌّ في رسالة بأزرارها،
+    والـShorts في موضوعها إن كان لها موضوع؛ وغيرها رسالةٌ للموقع."""
+    out = out or (lambda to, t, **k: tg_send(t, **k))
     ok = True
-    if src['type'] == 'youtube' and len(items) <= src.get('max_single', MAX_SINGLE):
-        det = yt_details(items)
-        for it in items:
-            ok = bool(out(fmt_video(src, it, det.get(it['key'][9:])), preview=True, markup=yt_buttons(cfg, it))) and ok
-    else:
+    if src['type'] != 'youtube':
         one = len(items) == 1 and src.get('preview', False)
         for m in fmt_site(src, items):
-            ok = bool(out(m, preview=one)) and ok
+            ok = bool(out(src, m, preview=one)) and ok
+        return ok
+    det = yt_details(items)
+    shorts = shorts_of(src)
+    parts = {}          # الوجهة ← فيديوهاتها، بترتيبها
+    for it in items:
+        to = shorts if shorts and (det.get(it['key'][9:]) or {}).get('short') else src
+        parts.setdefault(to['id'], (to, []))[1].append(it)
+    for to, part in parts.values():
+        print(f"    {to['id']}: {len(part)}")
+        if len(part) <= src.get('max_single', MAX_SINGLE):
+            for it in part:
+                ok = bool(out(to, fmt_video(src, it, det.get(it['key'][9:])), preview=True,
+                              markup=yt_buttons(cfg, it))) and ok
+        else:
+            for m in fmt_site(to, part):
+                ok = bool(out(to, m)) and ok
     return ok
 
 
@@ -972,7 +996,7 @@ def run(args):
         if not send:
             continue
         fresh.reverse()  # الأقدم أوّلًا
-        ok = send_new(cfg, src, fresh, lambda t, **k: grp.send(src, t, **k)) if fresh else True
+        ok = send_new(cfg, src, fresh, grp.send) if fresh else True
         if fresh and ok:
             state['last_new'][sid] = datetime.now().astimezone().isoformat(timespec='seconds')
         if not ok:
@@ -1032,7 +1056,7 @@ def send_recent(hours, dry=False):
         print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
         total += len(recent)
         if recent:
-            send_new(cfg, src, recent, show if dry else (lambda t, s=src, **k: grp.send(s, t, **k)))
+            send_new(cfg, src, recent, (lambda to, t, **k: show(t, **k)) if dry else grp.send)
     note = f'انتهى: {total} عنصرًا.'
     if undated:
         note += ('\nهذه المواقع لا تذكر وقت النشر، فلا يُعرف منها ما نُشر في ساعاتٍ بعينها، '
