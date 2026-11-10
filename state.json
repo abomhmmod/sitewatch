@@ -92,14 +92,14 @@
   "carateen": [
    "https://carateen.tv/watch/sp/61692484/30462040",
    "https://carateen.tv/watch/sp/61692503/67141571",
-   "https://carateen.tv/watch/sp/61692503/79169722",
    "https://carateen.tv/watch/sp/61692503/93533014",
+   "https://carateen.tv/watch/sp/61692503/79169722",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/94000749",
+   "https://carateen.tv/watch/sp/1197/94053507",
    "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/69865726",
-   "https://carateen.tv/watch/sp/1197/94053507",
+   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
    "https://carateen.tv/watch/sp/1243/31953160",
@@ -3855,6 +3855,9 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=154749",
+   "https://w1.anime4up.rest/?post_type=episode&p=154748",
+   "https://w1.anime4up.rest/?post_type=episode&p=154747",
    "https://w1.anime4up.rest/?post_type=episode&p=154746",
    "https://w1.anime4up.rest/?post_type=episode&p=154745",
    "https://w1.anime4up.rest/?post_type=episode&p=154744",
@@ -4355,12 +4358,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-10T05:40:20",
+ "last_run": "2026-11-10T06:41:15",
  "last_new": {
   "youtube": "2026-11-10T04:39:00+03:00",
   "filecr-mine": "2026-11-09T15:21:45+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-10T04:39:03+03:00",
+  "anime4up": "2026-11-10T06:40:57+03:00",
   "stardima": "2026-11-10T00:07:48+03:00",
   "fitgirl": "2026-11-10T04:39:24+03:00",
   "topcinema": "2026-11-10T04:39:17+03:00",
