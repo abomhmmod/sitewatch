@@ -85,8 +85,13 @@ function handle_(cq, done) {
 function tg_(method, payload) {
   const token = PropertiesService.getScriptProperties().getProperty('TELEGRAM_TOKEN');
   if (!token) throw new Error('ضع TELEGRAM_TOKEN في Project Settings ← Script Properties');
-  const r = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/' + method, {
-    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload), muteHttpExceptions: true,
-  });
+  let r;
+  try {
+    r = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/' + method, {
+      method: 'post', contentType: 'application/json', payload: JSON.stringify(payload), muteHttpExceptions: true,
+    });
+  } catch (e) {   // رسالة الخطأ فيها الرابط وفيه الرمز، فلا تُسجَّل كما هي
+    throw new Error('تعذّر الاتّصال بتيلغرام (' + method + '): ' + String(e.message).split(token).join('***'));
+  }
   try { return JSON.parse(r.getContentText()); } catch (e) { return { ok: false, description: 'HTTP ' + r.getResponseCode() }; }
 }

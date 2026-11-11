@@ -40,11 +40,18 @@ jobs:
             echo "::error::السرّ TELEGRAM_TOKEN أو TELEGRAM_CHAT_ID غير موجود. توقّف التشغيل قبل الفحص."
             exit 1
           fi
-          resp=$(curl -sS --max-time 30 "https://api.telegram.org/bot${TELEGRAM_TOKEN}/getMe" || true)
-          if ! printf '%s' "$resp" | python3 -c 'import json,sys; j=json.load(sys.stdin); assert j.get("ok"); print("البوت:", j["result"]["username"])'; then
-            echo "::error::رفض تيلغرام رمز البوت. توقّف التشغيل قبل الفحص حتّى لا يضيع جديد."
-            exit 1
-          fi
+          # أربع محاولات: انقطاعٌ عابر في الاتّصال بتيلغرام لا يُسقط الفحص
+          resp=$(curl -sS --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors "https://api.telegram.org/bot${TELEGRAM_TOKEN}/getMe" || true)
+          case "$resp" in
+            *'"ok":true'*)
+              echo "البوت يردّ." ;;
+            *'"ok":false'*)
+              echo "::error::رفض تيلغرام رمز البوت: ${resp}. توقّف التشغيل قبل الفحص حتّى لا يضيع جديد."
+              exit 1 ;;
+            *)
+              echo "::error::لم يردّ تيلغرام بعد أربع محاولات (والرمز لم يُرفض). توقّف هذا التشغيل قبل الفحص حتّى لا يضيع جديد، والتالي في موعده."
+              exit 1 ;;
+          esac
 
       - uses: actions/setup-python@v7
         with:
