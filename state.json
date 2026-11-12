@@ -1,6 +1,7 @@
 {
  "seen": {
   "anikoto": [
+   "https://anikototv.to/watch/koupen-chan-ln1xa#83",
    "https://anikototv.to/watch/umayuru-full-gate-41717#7",
    "https://anikototv.to/watch/a-returner-s-magic-should-be-special-season-2#6",
    "https://anikototv.to/watch/juuou-mujin-dandivine-d4687#6",
@@ -123,13 +124,13 @@
    "https://carateen.tv/watch/sp/61692499/94579772",
    "https://carateen.tv/watch/sp/61692478/99972502",
    "https://carateen.tv/watch/sp/61692484/30462040",
-   "https://carateen.tv/watch/sp/61692503/67141571",
-   "https://carateen.tv/watch/sp/61692503/79169722",
    "https://carateen.tv/watch/sp/61692503/93533014",
+   "https://carateen.tv/watch/sp/61692503/79169722",
+   "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/69865726",
+   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/94053507",
    "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/87985429",
@@ -1286,6 +1287,7 @@
    "https://a1.egydead.media/episodes/where-the-mask-ends-e30/"
   ],
   "youtube": [
+   "yt:video:pxf0IleO2dY",
    "yt:video:GhP3O3ZAzds",
    "yt:video:qfxM8NUtdaA",
    "yt:video:8BGbAHoFWBU",
@@ -1300,7 +1302,6 @@
    "yt:video:hFo3b9OCBAA",
    "yt:video:Rct0W_FG_As",
    "yt:video:m7uCr1GLXU4",
-   "yt:video:uw7fMywFnG4",
    "yt:video:I7IaqRJMi9w",
    "yt:video:U6I5PkZjWZU",
    "yt:video:ODDJXGY_1kQ",
@@ -1860,6 +1861,8 @@
    "yt:video:kiVm-MF0ZA4",
    "yt:video:M28sd5LAMIw",
    "yt:video:tWoQxmmDr1o",
+   "yt:video:qCpXaT0OJig",
+   "yt:video:3uAOBjs3e_o",
    "yt:video:HJ6b-rglxW4",
    "yt:video:EWofJbWItcg",
    "yt:video:jNbvlcB40-Y",
@@ -1873,8 +1876,6 @@
    "yt:video:R7Q4naf_Qw0",
    "yt:video:EWZoVluLKpU",
    "yt:video:7-xIvuAbhJ4",
-   "yt:video:E1wWqkvgCd4",
-   "yt:video:J1-x-Lthumk",
    "yt:video:3_8G0uDAYV0",
    "yt:video:0CW8uXjYhUg",
    "yt:video:6jkEHirxIdQ",
@@ -3437,6 +3438,8 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:4Ro2MgyXdDc",
+   "yt:video:8M7Ec47AkHw",
    "yt:video:UAwqOX7R4R4",
    "yt:video:QBmnCTimUY4",
    "yt:video:wTwPNbZfUhQ",
@@ -3450,8 +3453,6 @@
    "yt:video:Uf58yZii6Zc",
    "yt:video:k6ew4eQKQfM",
    "yt:video:DWDUgvToaX0",
-   "yt:video:xnIfV8cVkms",
-   "yt:video:SNPU6Brj1lg",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
    "yt:video:Fk8XaK32jNQ",
@@ -4612,8 +4613,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 12,
-  "mycima-movies": 12
+  "mycima-series": 13,
+  "mycima-movies": 13
  },
  "groups": {
   "github-stars": [
@@ -4861,9 +4862,9 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-12T11:27:49",
+ "last_run": "2026-11-12T12:29:01",
  "last_new": {
-  "youtube": "2026-11-12T11:27:28+03:00",
+  "youtube": "2026-11-12T12:28:41+03:00",
   "filecr-mine": "2026-11-12T11:27:46+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-12T11:27:32+03:00",
@@ -4875,7 +4876,7 @@
   "carateen": "2026-11-11T18:19:07+03:00",
   "mycima-series": "2026-11-11T10:25:37+03:00",
   "github-stars": "2026-11-11T13:29:48+03:00",
-  "anikoto": "2026-11-12T05:20:45+03:00"
+  "anikoto": "2026-11-12T12:28:44+03:00"
  },
  "status_msg": 25,
  "off": [
