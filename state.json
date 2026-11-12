@@ -128,10 +128,10 @@
    "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/58408411",
-   "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/94053507",
+   "https://carateen.tv/watch/sp/1197/94000749",
+   "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
    "https://carateen.tv/watch/sp/1243/31953160",
@@ -2383,6 +2383,7 @@
    "yt:video:F093jThvzC8",
    "yt:video:MMFOI7oqYcM",
    "yt:video:3jZ_BU8doWQ",
+   "yt:video:xaS0b3VHRto",
    "yt:video:hvUZjnwqOco",
    "yt:video:Uva2inaB0YE",
    "yt:video:siPwNXVo6pk",
@@ -2397,7 +2398,6 @@
    "yt:video:DJsi_9LD_zg",
    "yt:video:gJuKM1_L9yk",
    "yt:video:ahhe_WZbAck",
-   "yt:video:bw64Bb5lXbg",
    "yt:video:olVS64tkqfA",
    "yt:video:P5g_8Kx-D3Q",
    "yt:video:K9IZpEA0bqQ",
@@ -4156,6 +4156,10 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155367",
+   "https://w1.anime4up.rest/?post_type=episode&p=155366",
+   "https://w1.anime4up.rest/?post_type=episode&p=155365",
+   "https://w1.anime4up.rest/?post_type=episode&p=155364",
    "https://w1.anime4up.rest/?post_type=episode&p=155363",
    "https://w1.anime4up.rest/?post_type=episode&p=155362",
    "https://w1.anime4up.rest/?post_type=episode&p=155361",
@@ -4594,8 +4598,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 7,
-  "mycima-movies": 7
+  "mycima-series": 8,
+  "mycima-movies": 8
  },
  "groups": {
   "github-stars": [
@@ -4843,12 +4847,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-12T06:22:37",
+ "last_run": "2026-11-12T07:23:36",
  "last_new": {
-  "youtube": "2026-11-12T05:20:43+03:00",
+  "youtube": "2026-11-12T07:23:15+03:00",
   "filecr-mine": "2026-11-11T13:29:41+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-12T05:20:51+03:00",
+  "anime4up": "2026-11-12T07:23:18+03:00",
   "stardima": "2026-11-12T05:21:21+03:00",
   "fitgirl": "2026-11-12T06:22:36+03:00",
   "topcinema": "2026-11-12T05:21:30+03:00",
