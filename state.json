@@ -123,15 +123,15 @@
    "https://carateen.tv/watch/sp/61692499/94579772",
    "https://carateen.tv/watch/sp/61692478/99972502",
    "https://carateen.tv/watch/sp/61692484/30462040",
-   "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692503/79169722",
+   "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/69865726",
-   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/94053507",
+   "https://carateen.tv/watch/sp/1197/69865726",
+   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
    "https://carateen.tv/watch/sp/1243/31953160",
@@ -3167,6 +3167,7 @@
    "yt:video:wecy-2tYsBo",
    "yt:video:zDBmqFkT43A",
    "yt:video:34y9L9OvHyg",
+   "yt:video:I5RNuJuR-NE",
    "yt:video:G-arNSpC94o",
    "yt:video:OF2BLn6Gk1k",
    "yt:video:zz48d-hw8Qw",
@@ -3181,7 +3182,6 @@
    "yt:video:beDXuQ_zTNo",
    "yt:video:GIcva8wAaZs",
    "yt:video:mLdds98vWy8",
-   "yt:video:JjBDVRwCQbI",
    "yt:video:qIG9PGrs91M",
    "yt:video:mHEW-dmpN1c",
    "yt:video:DA--jXEjKDM",
@@ -4117,6 +4117,7 @@
    "yt:video:XMOljSA2vAU"
   ],
   "filecr-mine": [
+   "node-js@2026-11-12 07:16:53",
    "google-chrome@2026-11-12 04:38:01",
    "git-for-windows@2026-11-11 09:48:14",
    "windows-powershell@2026-11-11 09:38:20",
@@ -4129,7 +4130,6 @@
    "nvidia-app@2026-11-04 06:49:12",
    "protonvpn@2026-11-03 11:25:36",
    "marti-climent-wingetui@2026-10-30 04:12:59",
-   "node-js@2026-10-29 11:42:49",
    "qbittorrent@2026-10-21 07:03:55",
    "mkvtoolnix@2026-10-19 09:36:11",
    "google-gemini-for-windows@2026-10-14 13:23:22",
@@ -4146,6 +4146,7 @@
    "megasync-desktop@2025-10-06 10:56:14",
    "honeyview@2025-10-06 10:54:04",
    "steam@2024-08-13 16:51:25",
+   "node-js@2026-10-29 11:42:49",
    "google-chrome@2026-11-10 06:06:40",
    "git-for-windows@2026-10-27 11:34:01",
    "windows-powershell@2026-10-26 10:51:44",
@@ -4157,6 +4158,10 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155375",
+   "https://w1.anime4up.rest/?post_type=episode&p=155374",
+   "https://w1.anime4up.rest/?post_type=episode&p=155373",
+   "https://w1.anime4up.rest/?post_type=episode&p=155372",
    "https://w1.anime4up.rest/?post_type=episode&p=155371",
    "https://w1.anime4up.rest/?post_type=episode&p=155370",
    "https://w1.anime4up.rest/?post_type=episode&p=155369",
@@ -4603,8 +4608,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 10,
-  "mycima-movies": 10
+  "mycima-series": 11,
+  "mycima-movies": 11
  },
  "groups": {
   "github-stars": [
@@ -4852,12 +4857,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-12T09:25:31",
+ "last_run": "2026-11-12T10:26:35",
  "last_new": {
-  "youtube": "2026-11-12T09:25:11+03:00",
-  "filecr-mine": "2026-11-12T08:24:27+03:00",
+  "youtube": "2026-11-12T10:26:10+03:00",
+  "filecr-mine": "2026-11-12T10:26:31+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-12T08:24:14+03:00",
+  "anime4up": "2026-11-12T10:26:14+03:00",
   "stardima": "2026-11-12T05:21:21+03:00",
   "fitgirl": "2026-11-12T06:22:36+03:00",
   "topcinema": "2026-11-12T05:21:30+03:00",
