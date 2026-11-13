@@ -183,15 +183,15 @@
    "https://carateen.tv/watch/sp/61692499/94579772",
    "https://carateen.tv/watch/sp/61692478/99972502",
    "https://carateen.tv/watch/sp/61692484/30462040",
+   "https://carateen.tv/watch/sp/61692503/79169722",
    "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692503/93533014",
-   "https://carateen.tv/watch/sp/61692503/79169722",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/69865726",
-   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/94053507",
+   "https://carateen.tv/watch/sp/1197/94000749",
+   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
    "https://carateen.tv/watch/sp/1243/31953160",
@@ -205,6 +205,17 @@
    "https://carateen.tv/watch/sp/61692496/74741105"
   ],
   "topcinema": [
+   "https://topcinemaa.one/?p=260123",
+   "https://topcinemaa.one/?p=260120",
+   "https://topcinemaa.one/?p=260129",
+   "https://topcinemaa.one/?p=260100",
+   "https://topcinemaa.one/?p=259752",
+   "https://topcinemaa.one/?p=259524",
+   "https://topcinemaa.one/?p=259746",
+   "https://topcinemaa.one/?p=260152",
+   "https://topcinemaa.one/?p=260150",
+   "https://topcinemaa.one/?p=260148",
+   "https://topcinemaa.one/?p=260146",
    "https://topcinemaa.one/?p=260091",
    "https://topcinemaa.one/?p=260090",
    "https://topcinemaa.one/?p=260089",
@@ -793,18 +804,7 @@
    "https://topcinemaa.vip/?p=259164",
    "https://topcinemaa.vip/?p=259163",
    "https://topcinemaa.vip/?p=259159",
-   "https://topcinemaa.vip/?p=259156",
-   "https://topcinemaa.vip/?p=259155",
-   "https://topcinemaa.vip/?p=258884",
-   "https://topcinemaa.vip/?p=258883",
-   "https://topcinemaa.vip/?p=259153",
-   "https://topcinemaa.vip/?p=259151",
-   "https://topcinemaa.vip/?p=259149",
-   "https://topcinemaa.vip/?p=259136",
-   "https://topcinemaa.vip/?p=256670",
-   "https://topcinemaa.vip/?p=259147",
-   "https://topcinemaa.vip/?p=259039",
-   "https://topcinemaa.vip/?p=259131"
+   "https://topcinemaa.vip/?p=259156"
   ],
   "impractical-jokers": [
    "3704012",
@@ -3781,6 +3781,7 @@
    "yt:video:VZUmD7W01g8",
    "yt:video:w8wlEzrxEeo",
    "yt:video:5NyN5sV-sgo",
+   "yt:video:XGWkr3CXwr8",
    "yt:video:y4tBK7Dsi-4",
    "yt:video:8Std6aS6hNc",
    "yt:video:gASIji8IkbU",
@@ -3795,7 +3796,6 @@
    "yt:video:fPQClI-1l7g",
    "yt:video:7imPuzNyeSA",
    "yt:video:K8pclsIQiyI",
-   "yt:video:mI0zazijQYk",
    "yt:video:Y1vEGsnNYek",
    "yt:video:fEjvSbI_PT4",
    "yt:video:KBfIo9sZbC4",
@@ -4279,6 +4279,10 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155607",
+   "https://w1.anime4up.rest/?post_type=episode&p=155606",
+   "https://w1.anime4up.rest/?post_type=episode&p=155605",
+   "https://w1.anime4up.rest/?post_type=episode&p=155604",
    "https://w1.anime4up.rest/?post_type=episode&p=155603",
    "https://w1.anime4up.rest/?post_type=episode&p=155587",
    "https://w1.anime4up.rest/?post_type=episode&p=155586",
@@ -4861,8 +4865,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 12,
-  "mycima-movies": 12
+  "mycima-series": 13,
+  "mycima-movies": 13
  },
  "groups": {
   "github-stars": [
@@ -5110,15 +5114,15 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-13T04:56:32",
+ "last_run": "2026-11-13T05:57:48",
  "last_new": {
-  "youtube": "2026-11-13T04:13:55+03:00",
+  "youtube": "2026-11-13T05:57:21+03:00",
   "filecr-mine": "2026-11-12T14:30:11+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-13T04:13:58+03:00",
+  "anime4up": "2026-11-13T05:57:24+03:00",
   "stardima": "2026-11-12T21:43:39+03:00",
   "fitgirl": "2026-11-13T04:14:14+03:00",
-  "topcinema": "2026-11-12T23:07:05+03:00",
+  "topcinema": "2026-11-13T05:57:39+03:00",
   "mycima-movies": "2026-11-09T18:26:32+03:00",
   "wco": "2026-11-13T00:08:19+03:00",
   "carateen": "2026-11-11T18:19:07+03:00",
