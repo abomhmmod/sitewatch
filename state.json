@@ -188,9 +188,9 @@
    "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/69865726",
+   "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/94053507",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
@@ -2174,6 +2174,7 @@
    "yt:video:r8WMKkhJZu4",
    "yt:video:dvf1Dnim7AE",
    "yt:video:A4AtcG_oOz4",
+   "yt:video:2AADaqAmNdg",
    "yt:video:fznOv9VeEDo",
    "yt:video:8aMEPQiTluA",
    "yt:video:uYCYKySu280",
@@ -2188,7 +2189,6 @@
    "yt:video:wmnLpl9sxrU",
    "yt:video:bLDCM37gEG8",
    "yt:video:BFU7ZER0tUM",
-   "yt:video:_KIgemFUf4s",
    "yt:video:F3quHWek_N4",
    "yt:video:6FXZuUaBCw0",
    "yt:video:GAeUxQ8RWfc",
@@ -3556,6 +3556,7 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:q52fv3O5LVg",
    "yt:video:XuL1kWj_PGw",
    "yt:video:APu1DbPv9UA",
    "yt:video:p-cCVKCBYI8",
@@ -3570,7 +3571,6 @@
    "yt:video:BTJdr-GK3GU",
    "yt:video:LhkQTICIGog",
    "yt:video:wClZd-wygCA",
-   "yt:video:NS5gZoIVcaI",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
    "yt:video:Fk8XaK32jNQ",
@@ -4870,8 +4870,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 15,
-  "mycima-movies": 15
+  "mycima-series": 16,
+  "mycima-movies": 16
  },
  "groups": {
   "github-stars": [
@@ -5119,9 +5119,9 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-13T07:59:40",
+ "last_run": "2026-11-13T09:00:35",
  "last_new": {
-  "youtube": "2026-11-13T07:59:17+03:00",
+  "youtube": "2026-11-13T09:00:18+03:00",
   "filecr-mine": "2026-11-12T14:30:11+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-13T07:59:22+03:00",
