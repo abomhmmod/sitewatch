@@ -183,14 +183,14 @@
    "https://carateen.tv/watch/sp/61692499/94579772",
    "https://carateen.tv/watch/sp/61692478/99972502",
    "https://carateen.tv/watch/sp/61692484/30462040",
-   "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692503/79169722",
+   "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
+   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/94053507",
-   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/87985429",
    "https://carateen.tv/watch/sp/61692469/69068261",
@@ -1133,6 +1133,8 @@
   ],
   "fitgirl": [
    "https://fitgirl-repacks.site/?p=68049",
+   "https://fitgirl-repacks.site/?p=83567",
+   "https://fitgirl-repacks.site/?p=83006",
    "https://fitgirl-repacks.site/?p=83562",
    "http://fitgirl-repacks.site/?p=9834",
    "https://fitgirl-repacks.site/?p=83554",
@@ -2290,6 +2292,8 @@
    "yt:video:JYMLwcwKAa8",
    "yt:video:FPnGxz2DeUk",
    "yt:video:QD7Ji9Dx954",
+   "yt:video:YVCqTWxtbZQ",
+   "yt:video:14-SP4ig5Zc",
    "yt:video:Hqn8kg7ikpU",
    "yt:video:IJ4EgdTpNx4",
    "yt:video:_l1sKI_XjEQ",
@@ -2303,8 +2307,6 @@
    "yt:video:I9a4tA9xfDE",
    "yt:video:KbTOgPbJQNE",
    "yt:video:FImxUf0jKGI",
-   "yt:video:46iBb-vTRGw",
-   "yt:video:228B9kvO_G4",
    "yt:video:qc4USaonS8Q",
    "yt:video:l8O_8sp2jow",
    "yt:video:b9GVXnSOsI8",
@@ -2665,7 +2667,6 @@
    "yt:video:GbetzV4l4CY",
    "yt:video:RQdxHi4_Pvc",
    "yt:video:XJKv8XqO5zQ",
-   "yt:video:8r-IL6EWhTE",
    "yt:video:0fh4yTsRN78",
    "yt:video:TRYC1uVEa0g",
    "yt:video:Qkqu4Fp7Ne0",
@@ -2680,6 +2681,7 @@
    "yt:video:HB-qGi0Wi08",
    "yt:video:JtowRUSqZSI",
    "yt:video:4Oi-Tf_xB6w",
+   "yt:video:6LWtS3qZ3O8",
    "yt:video:3ojvF06qS48",
    "yt:video:BjKRprUVnPQ",
    "yt:video:9pJ7x9Un4qA",
@@ -3005,6 +3007,7 @@
    "yt:video:2a0I4TCu-fs",
    "yt:video:L28pO6MwseM",
    "yt:video:YS8kKlNOPHc",
+   "yt:video:StDa4c6L1-s",
    "yt:video:nYsHmYlQb_k",
    "yt:video:AYv2EQ7Spo0",
    "yt:video:YdZfqaJx31U",
@@ -3015,7 +3018,6 @@
    "yt:video:DsSC7G6rA34",
    "yt:video:sDfSwtY5i7k",
    "yt:video:Y9S0x-KL1nk",
-   "yt:video:l3n4x-NmCdc",
    "yt:video:TU1Te9VrqH4",
    "yt:video:mJicnGqY7e0",
    "yt:video:RMBozBXdHNE",
@@ -4277,6 +4279,10 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155603",
+   "https://w1.anime4up.rest/?post_type=episode&p=155587",
+   "https://w1.anime4up.rest/?post_type=episode&p=155586",
+   "https://w1.anime4up.rest/?post_type=episode&p=155585",
    "https://w1.anime4up.rest/?post_type=episode&p=155584",
    "https://w1.anime4up.rest/?post_type=episode&p=155583",
    "https://w1.anime4up.rest/?post_type=episode&p=155582",
@@ -4855,8 +4861,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 10,
-  "mycima-movies": 10
+  "mycima-series": 11,
+  "mycima-movies": 11
  },
  "groups": {
   "github-stars": [
@@ -5104,14 +5110,14 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-13T03:12:49",
+ "last_run": "2026-11-13T04:14:15",
  "last_new": {
-  "youtube": "2026-11-13T03:12:23+03:00",
+  "youtube": "2026-11-13T04:13:55+03:00",
   "filecr-mine": "2026-11-12T14:30:11+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-13T03:12:30+03:00",
+  "anime4up": "2026-11-13T04:13:58+03:00",
   "stardima": "2026-11-12T21:43:39+03:00",
-  "fitgirl": "2026-11-13T03:12:47+03:00",
+  "fitgirl": "2026-11-13T04:14:14+03:00",
   "topcinema": "2026-11-12T23:07:05+03:00",
   "mycima-movies": "2026-11-09T18:26:32+03:00",
   "wco": "2026-11-13T00:08:19+03:00",
