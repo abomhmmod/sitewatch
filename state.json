@@ -1,6 +1,7 @@
 {
  "seen": {
   "anikoto": [
+   "https://anikototv.to/watch/steel-ball-run-jojo-s-bizarre-adventure-2nd-stage-56faa#8",
    "https://anikototv.to/watch/soar-high-isami-1e6b7#9",
    "https://anikototv.to/watch/the-ramparts-of-ice-season-2-d7c45#7",
    "https://anikototv.to/watch/with-vengeance-sincerely-your-broken-saintess-season-2-e76e1#7",
@@ -181,16 +182,17 @@
    "https://wcopanel.cizgifilmlerizle.com/maebee-episode-23-mae-bee-and-the-shooting-star"
   ],
   "carateen": [
+   "https://carateen.tv/watch/sp/61691661/26918946",
    "https://carateen.tv/watch/sp/61692499/94579772",
    "https://carateen.tv/watch/sp/61692478/99972502",
    "https://carateen.tv/watch/sp/61692484/30462040",
-   "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692503/79169722",
+   "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/94053507",
+   "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/58408411",
    "https://carateen.tv/watch/sp/1197/87985429",
@@ -3288,6 +3290,8 @@
    "yt:video:wecy-2tYsBo",
    "yt:video:zDBmqFkT43A",
    "yt:video:34y9L9OvHyg",
+   "yt:video:EaFABYkGOFk",
+   "yt:video:ue9OiJGUCE4",
    "yt:video:I5RNuJuR-NE",
    "yt:video:G-arNSpC94o",
    "yt:video:OF2BLn6Gk1k",
@@ -3301,8 +3305,6 @@
    "yt:video:_zZZ9CSnSKQ",
    "yt:video:aaRVBIBdGtg",
    "yt:video:beDXuQ_zTNo",
-   "yt:video:GIcva8wAaZs",
-   "yt:video:mLdds98vWy8",
    "yt:video:qIG9PGrs91M",
    "yt:video:mHEW-dmpN1c",
    "yt:video:DA--jXEjKDM",
@@ -3558,6 +3560,8 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:HVSdxjQGwQo",
+   "yt:video:3HUEYbIR2Sw",
    "yt:video:0pWkOrF2UZo",
    "yt:video:XTKhgkU5dYU",
    "yt:video:q52fv3O5LVg",
@@ -3571,8 +3575,6 @@
    "yt:video:HRhjSr90W_s",
    "yt:video:ZDqIV2VkqFY",
    "yt:video:8kfZzJ2UUx8",
-   "yt:video:geOCToWr2LY",
-   "yt:video:BTJdr-GK3GU",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
    "yt:video:Fk8XaK32jNQ",
@@ -3948,6 +3950,7 @@
    "yt:video:7O_58BklxkU",
    "yt:video:PXJZmA7MYH4",
    "yt:video:iX4oo8j-mjQ",
+   "yt:video:VWwFaIKmXD8",
    "yt:video:UA5vRfqQ3Zs",
    "yt:video:wQ2aIkoEyHc",
    "yt:video:HMNu5SNg02E",
@@ -3962,7 +3965,6 @@
    "yt:video:FG3URLH5KN4",
    "yt:video:eHR-q8vWlJQ",
    "yt:video:jdsqkjYwWv8",
-   "yt:video:60yOtWsGR8Q",
    "yt:video:1MU18RCUR-w",
    "yt:video:kbUeL25BUF8",
    "yt:video:2VeiGxWpuho",
@@ -4282,6 +4284,9 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155652",
+   "https://w1.anime4up.rest/?post_type=episode&p=155651",
+   "https://w1.anime4up.rest/?post_type=episode&p=155650",
    "https://w1.anime4up.rest/?post_type=episode&p=155649",
    "https://w1.anime4up.rest/?post_type=episode&p=155648",
    "https://w1.anime4up.rest/?post_type=episode&p=155647",
@@ -4877,8 +4882,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 18,
-  "mycima-movies": 18
+  "mycima-series": 19,
+  "mycima-movies": 19
  },
  "groups": {
   "github-stars": [
@@ -5126,21 +5131,21 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-13T11:02:52",
+ "last_run": "2026-11-13T12:04:15",
  "last_new": {
-  "youtube": "2026-11-13T11:02:29+03:00",
+  "youtube": "2026-11-13T12:03:53+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-13T10:01:24+03:00",
+  "anime4up": "2026-11-13T12:03:58+03:00",
   "stardima": "2026-11-12T21:43:39+03:00",
   "fitgirl": "2026-11-13T04:14:14+03:00",
   "topcinema": "2026-11-13T05:57:39+03:00",
   "mycima-movies": "2026-11-09T18:26:32+03:00",
   "wco": "2026-11-13T00:08:19+03:00",
-  "carateen": "2026-11-11T18:19:07+03:00",
+  "carateen": "2026-11-13T12:04:07+03:00",
   "mycima-series": "2026-11-12T13:30:07+03:00",
   "github-stars": "2026-11-13T11:02:52+03:00",
-  "anikoto": "2026-11-13T11:02:31+03:00"
+  "anikoto": "2026-11-13T12:03:55+03:00"
  },
  "status_msg": 25,
  "off": [
