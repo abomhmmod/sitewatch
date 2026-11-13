@@ -183,13 +183,13 @@
    "https://carateen.tv/watch/sp/61692499/94579772",
    "https://carateen.tv/watch/sp/61692478/99972502",
    "https://carateen.tv/watch/sp/61692484/30462040",
-   "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692503/67141571",
    "https://carateen.tv/watch/sp/61692503/79169722",
+   "https://carateen.tv/watch/sp/61692503/93533014",
    "https://carateen.tv/watch/sp/61692504/84555605",
    "https://carateen.tv/watch/sp/1197/23051945",
-   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/58408411",
+   "https://carateen.tv/watch/sp/1197/94000749",
    "https://carateen.tv/watch/sp/1197/69865726",
    "https://carateen.tv/watch/sp/1197/94053507",
    "https://carateen.tv/watch/sp/1197/87985429",
@@ -1660,6 +1660,7 @@
    "yt:video:vGUMciArYOQ",
    "yt:video:_uFChNCmqS4",
    "yt:video:yoZcBX_RR2I",
+   "yt:video:VLGo9jObBec",
    "yt:video:pnfD83sTtVA",
    "yt:video:-fZPfvRDFuc",
    "yt:video:XOrZRQOZPiQ",
@@ -1674,7 +1675,6 @@
    "yt:video:AiG2YjXnCno",
    "yt:video:q6fPJD12nV4",
    "yt:video:UwhlWwoTWKk",
-   "yt:video:oSn43nMEhxo",
    "yt:video:3JkTciGw5SE",
    "yt:video:FHP_r-cgqiE",
    "yt:video:T9Rm762xF04",
@@ -3013,11 +3013,11 @@
    "yt:video:YdZfqaJx31U",
    "yt:video:pvU_bQdFrVc",
    "yt:video:uU9T9Vdi1eM",
+   "yt:video:v72C4E8uJNc",
    "yt:video:IMmtFGquQlc",
    "yt:video:SC6_gIh1uJE",
    "yt:video:DsSC7G6rA34",
    "yt:video:sDfSwtY5i7k",
-   "yt:video:Y9S0x-KL1nk",
    "yt:video:TU1Te9VrqH4",
    "yt:video:mJicnGqY7e0",
    "yt:video:RMBozBXdHNE",
@@ -4279,6 +4279,11 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155612",
+   "https://w1.anime4up.rest/?post_type=episode&p=155611",
+   "https://w1.anime4up.rest/?post_type=episode&p=155610",
+   "https://w1.anime4up.rest/?post_type=episode&p=155609",
+   "https://w1.anime4up.rest/?post_type=episode&p=155608",
    "https://w1.anime4up.rest/?post_type=episode&p=155607",
    "https://w1.anime4up.rest/?post_type=episode&p=155606",
    "https://w1.anime4up.rest/?post_type=episode&p=155605",
@@ -4865,8 +4870,8 @@
   ]
  },
  "fail": {
-  "mycima-series": 14,
-  "mycima-movies": 14
+  "mycima-series": 15,
+  "mycima-movies": 15
  },
  "groups": {
   "github-stars": [
@@ -5114,12 +5119,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-13T06:58:38",
+ "last_run": "2026-11-13T07:59:40",
  "last_new": {
-  "youtube": "2026-11-13T06:58:23+03:00",
+  "youtube": "2026-11-13T07:59:17+03:00",
   "filecr-mine": "2026-11-12T14:30:11+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-13T05:57:24+03:00",
+  "anime4up": "2026-11-13T07:59:22+03:00",
   "stardima": "2026-11-12T21:43:39+03:00",
   "fitgirl": "2026-11-13T04:14:14+03:00",
   "topcinema": "2026-11-13T05:57:39+03:00",
