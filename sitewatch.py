@@ -432,7 +432,8 @@ def read_tvmaze(src):
 
 def read_page_links(src):
     """صفحة عاديّة: روابطها التي تطابق نمطًا (pattern)، ومعها pages صفحةً إن ذُكرت.
-    title_sel: إن ذُكر أُخذ العنوان من هذا العنصر داخل الرابط، لا من نصّ الرابط كلّه."""
+    title_sel: إن ذُكر أُخذ العنوان من هذا العنصر داخل الرابط، لا من نصّ الرابط كلّه.
+    title_attr: إن ذُكر أُخذ العنوان من سمة الرابط هذه (title مثلًا)، لا من نصّه."""
     from bs4 import BeautifulSoup
     r = get(src['url'])
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -448,7 +449,9 @@ def read_page_links(src):
         n = 0
         for a in soup.select('a[href]'):
             href = a['href']
-            if src.get('title_sel'):
+            if src.get('title_attr'):
+                text = clean(a.get(src['title_attr']))
+            elif src.get('title_sel'):
                 el = a.select_one(src['title_sel'])
                 text = clean(el.get_text()) if el else ''
             else:
@@ -461,7 +464,7 @@ def read_page_links(src):
 
     collect(soup)
     if not out:     # روابط تطابق النمط لكن بلا عنوان (تغيّر شكل الصفحة): فحصٌ متعذّر، لا «لا جديد»
-        raise ValueError(f'روابط تطابق النمط لكن بلا عنوان (title_sel={src.get("title_sel")!r})، فلعلّ شكل الصفحة تغيّر')
+        raise ValueError(f'روابط تطابق النمط لكن بلا عنوان (title_sel={src.get("title_sel")!r}, title_attr={src.get("title_attr")!r})، فلعلّ شكل الصفحة تغيّر')
     # pages: صفحاتٌ تالية تُقرأ أيضًا (url/page/2/ …)، فلا يضيع ما يُنشر دفعةً واحدة أكثر من صفحة
     for n in range(2, src.get('pages', 1) + 1):
         try:
