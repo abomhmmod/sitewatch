@@ -2323,6 +2323,7 @@
    "yt:video:JYMLwcwKAa8",
    "yt:video:FPnGxz2DeUk",
    "yt:video:QD7Ji9Dx954",
+   "yt:video:R85EiqrjJBg",
    "yt:video:SulHI_kf8Ic",
    "yt:video:rWjYYFiIlts",
    "yt:video:2WgudqkkoTM",
@@ -2337,7 +2338,6 @@
    "yt:video:W8fbbaiBSCw",
    "yt:video:us8DyMtn6jA",
    "yt:video:jWdFNa9tVkQ",
-   "yt:video:HA-H7KfR2vE",
    "yt:video:qc4USaonS8Q",
    "yt:video:l8O_8sp2jow",
    "yt:video:b9GVXnSOsI8",
@@ -3034,6 +3034,7 @@
    "yt:video:NwFDonyI-go",
    "yt:video:pOLT585Bxtk",
    "yt:video:i_tmjqbYCmk",
+   "yt:video:Km-vDCEa6yc",
    "yt:video:T7mT73NC-uw",
    "yt:video:hQsvWlxNNnc",
    "yt:video:bdeMmmNcvX4",
@@ -3048,7 +3049,6 @@
    "yt:video:L28pO6MwseM",
    "yt:video:YS8kKlNOPHc",
    "yt:video:nYsHmYlQb_k",
-   "yt:video:AYv2EQ7Spo0",
    "yt:video:TU1Te9VrqH4",
    "yt:video:mJicnGqY7e0",
    "yt:video:RMBozBXdHNE",
@@ -4311,6 +4311,11 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155737",
+   "https://w1.anime4up.rest/?post_type=episode&p=155736",
+   "https://w1.anime4up.rest/?post_type=episode&p=155735",
+   "https://w1.anime4up.rest/?post_type=episode&p=155734",
+   "https://w1.anime4up.rest/?post_type=episode&p=155733",
    "https://w1.anime4up.rest/?post_type=episode&p=155732",
    "https://w1.anime4up.rest/?post_type=episode&p=155731",
    "https://w1.anime4up.rest/?post_type=episode&p=155730",
@@ -5028,12 +5033,46 @@
    "https://www.stardima.com/tvshow/video-245/play/13624"
   ],
   "laroza-series": [
-   "https://laroza1.site/video.php?vid=c4f97653b",
-   "https://laroza1.site/video.php?vid=4f9e81f59",
    "https://laroza1.site/video.php?vid=ca351c4b4",
    "https://laroza1.site/video.php?vid=5b5821fd3",
+   "https://laroza1.site/video.php?vid=c4f97653b",
+   "https://laroza1.site/video.php?vid=4f9e81f59",
    "https://laroza1.site/video.php?vid=ab0796dc2",
    "https://laroza1.site/video.php?vid=71c323797",
+   "https://laroza1.site/video.php?vid=ea5d0e87c",
+   "https://laroza1.site/video.php?vid=e7337249c",
+   "https://laroza1.site/video.php?vid=9bf3aa2c2",
+   "https://laroza1.site/video.php?vid=dd263c39e",
+   "https://laroza1.site/video.php?vid=130ab8503",
+   "https://laroza1.site/video.php?vid=9eb7c5a3e",
+   "https://laroza1.site/video.php?vid=dd2628bd8",
+   "https://laroza1.site/video.php?vid=ed2ca7bdb",
+   "https://laroza1.site/video.php?vid=666e10b67",
+   "https://laroza1.site/video.php?vid=715a08b65",
+   "https://laroza1.site/video.php?vid=57ae2eb6a",
+   "https://laroza1.site/video.php?vid=8d4b6a1d7",
+   "https://laroza1.site/video.php?vid=91d3ff08f",
+   "https://laroza1.site/video.php?vid=9ad8edfd2",
+   "https://laroza1.site/video.php?vid=42f500032",
+   "https://laroza1.site/video.php?vid=cce870a14",
+   "https://laroza1.site/video.php?vid=d221ed96f",
+   "https://laroza1.site/video.php?vid=4d96b6a99",
+   "https://laroza1.site/video.php?vid=97f8e4d41",
+   "https://laroza1.site/video.php?vid=47e2d5ad9",
+   "https://laroza1.site/video.php?vid=380e3c877",
+   "https://laroza1.site/video.php?vid=4fcd774e6",
+   "https://laroza1.site/video.php?vid=164ebd7c7",
+   "https://laroza1.site/video.php?vid=fb98ab580",
+   "https://laroza1.site/video.php?vid=e9e47c1db",
+   "https://laroza1.site/video.php?vid=cf4e82df7",
+   "https://laroza1.site/video.php?vid=b0c7d638f",
+   "https://laroza1.site/video.php?vid=4bb81ab6f",
+   "https://laroza1.site/video.php?vid=8dca9afba",
+   "https://laroza1.site/video.php?vid=ee9530256",
+   "https://laroza1.site/video.php?vid=75f6c73ff",
+   "https://laroza1.site/video.php?vid=a88fb3702",
+   "https://laroza1.site/video.php?vid=fb816d898",
+   "https://laroza1.site/video.php?vid=9e15b7905",
    "https://laroza1.site/video.php?vid=YdGwcBpIW",
    "https://laroza1.site/video.php?vid=371153947",
    "https://laroza1.site/video.php?vid=2d22ef337",
@@ -5072,6 +5111,7 @@
    "https://laroza1.site/video.php?vid=a37760678"
   ],
   "laroza-movies": [
+   "https://laroza1.site/video.php?vid=06906fa94",
    "https://laroza1.site/video.php?vid=Y9hR1NXQ1",
    "https://laroza1.site/video.php?vid=YDKxHqxsS",
    "https://laroza1.site/video.php?vid=fe9c3722b",
@@ -5081,7 +5121,6 @@
    "https://laroza1.site/video.php?vid=8c7edfc20",
    "https://laroza1.site/video.php?vid=d7804b752",
    "https://laroza1.site/video.php?vid=313f66fe3",
-   "https://laroza1.site/video.php?vid=Y0aYtAay8",
    "https://laroza1.site/video.php?vid=1506adafd",
    "https://laroza1.site/video.php?vid=1036989b4",
    "https://laroza1.site/video.php?vid=10de89da7",
@@ -5111,7 +5150,8 @@
    "https://laroza1.site/video.php?vid=a391bfa42",
    "https://laroza1.site/video.php?vid=43717cda4",
    "https://laroza1.site/video.php?vid=6abaf0dd8",
-   "https://laroza1.site/video.php?vid=5bacbac06"
+   "https://laroza1.site/video.php?vid=5bacbac06",
+   "https://laroza1.site/video.php?vid=Y0aYtAay8"
   ]
  },
  "fail": {
@@ -5364,12 +5404,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-14T02:57:07",
+ "last_run": "2026-11-14T03:58:13",
  "last_new": {
-  "youtube": "2026-11-14T02:56:41+03:00",
+  "youtube": "2026-11-14T03:57:49+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-14T02:56:48+03:00",
+  "anime4up": "2026-11-14T03:57:54+03:00",
   "stardima": "2026-11-13T22:28:52+03:00",
   "fitgirl": "2026-11-14T02:57:05+03:00",
   "topcinema": "2026-11-13T21:27:22+03:00",
@@ -5379,7 +5419,8 @@
   "mycima-series": "2026-11-12T13:30:07+03:00",
   "github-stars": "2026-11-13T11:02:52+03:00",
   "anikoto": "2026-11-13T20:25:44+03:00",
-  "laroza-series": "2026-11-14T02:57:02+03:00"
+  "laroza-series": "2026-11-14T03:58:09+03:00",
+  "laroza-movies": "2026-11-14T03:58:11+03:00"
  },
  "status_msg": 25,
  "off": [
@@ -5411,8 +5452,7 @@
   },
   "unpin": [
    "impractical-jokers",
-   "mycima-movies",
-   "laroza-movies"
+   "mycima-movies"
   ]
  },
  "status_chat": "-1003928536381"
