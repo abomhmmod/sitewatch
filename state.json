@@ -1443,6 +1443,7 @@
    "https://a1.egydead.media/episodes/where-the-mask-ends-e30/"
   ],
   "youtube": [
+   "yt:video:A-R6DbwtsiQ",
    "yt:video:SpkDA5qXUaw",
    "yt:video:CZer1oiTQhE",
    "yt:video:aOfDoWbk024",
@@ -1457,7 +1458,6 @@
    "yt:video:3YhX6HhKmsk",
    "yt:video:I1c8D08AQ0c",
    "yt:video:8QrsTddbocQ",
-   "yt:video:MunrrMg7EgA",
    "yt:video:I7IaqRJMi9w",
    "yt:video:U6I5PkZjWZU",
    "yt:video:ODDJXGY_1kQ",
@@ -3594,6 +3594,7 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:aILwSvrUzMw",
    "yt:video:ckpGnnpKqdg",
    "yt:video:W5aJyJ2FgTU",
    "yt:video:9jhZhasqgSE",
@@ -3608,7 +3609,6 @@
    "yt:video:19PdpT9uhw0",
    "yt:video:ULhXbZgzAWc",
    "yt:video:gTKKLfCs1lU",
-   "yt:video:A2m7XTK0F3A",
    "yt:video:dOHqXKxA8UU",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
@@ -3984,6 +3984,7 @@
    "yt:video:7O_58BklxkU",
    "yt:video:PXJZmA7MYH4",
    "yt:video:iX4oo8j-mjQ",
+   "yt:video:-cWJ4nL-OW4",
    "yt:video:SeNf2mTlzHE",
    "yt:video:VWwFaIKmXD8",
    "yt:video:UA5vRfqQ3Zs",
@@ -3998,7 +3999,6 @@
    "yt:video:6SB8G_VS0H8",
    "yt:video:T62Il-RhtTA",
    "yt:video:FG3URLH5KN4",
-   "yt:video:eHR-q8vWlJQ",
    "yt:video:1MU18RCUR-w",
    "yt:video:kbUeL25BUF8",
    "yt:video:2VeiGxWpuho",
@@ -5448,9 +5448,9 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-14T11:37:49",
+ "last_run": "2026-11-14T12:38:39",
  "last_new": {
-  "youtube": "2026-11-14T11:37:27+03:00",
+  "youtube": "2026-11-14T12:38:24+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-14T11:37:31+03:00",
