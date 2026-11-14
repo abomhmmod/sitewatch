@@ -3594,6 +3594,7 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:ckpGnnpKqdg",
    "yt:video:W5aJyJ2FgTU",
    "yt:video:9jhZhasqgSE",
    "yt:video:aU8BoQ933jk",
@@ -3608,7 +3609,6 @@
    "yt:video:ULhXbZgzAWc",
    "yt:video:gTKKLfCs1lU",
    "yt:video:A2m7XTK0F3A",
-   "yt:video:ADs7apAgtSI",
    "yt:video:dOHqXKxA8UU",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
@@ -4318,6 +4318,10 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=155797",
+   "https://w1.anime4up.rest/?post_type=episode&p=155796",
+   "https://w1.anime4up.rest/?post_type=episode&p=156272",
+   "https://w1.anime4up.rest/?post_type=episode&p=155795",
    "https://w1.anime4up.rest/?post_type=episode&p=155778",
    "https://w1.anime4up.rest/?post_type=episode&p=155777",
    "https://w1.anime4up.rest/?post_type=episode&p=155776",
@@ -5444,12 +5448,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-14T10:36:46",
+ "last_run": "2026-11-14T11:37:49",
  "last_new": {
-  "youtube": "2026-11-14T10:36:28+03:00",
+  "youtube": "2026-11-14T11:37:27+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-14T09:35:32+03:00",
+  "anime4up": "2026-11-14T11:37:31+03:00",
   "stardima": "2026-11-13T22:28:52+03:00",
   "fitgirl": "2026-11-14T06:32:52+03:00",
   "topcinema": "2026-11-13T21:27:22+03:00",
