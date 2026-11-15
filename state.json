@@ -1,7 +1,7 @@
 {
  "seen": {
   "anikoto": [
-   "https://anikototv.bz/watch/space-warrior-baldios-f8092#32",
+   "https://anikototv.bz/watch/koupen-chan-ln1xa#84",
    "https://anikototv.bz/watch/punirunes-puni-4-9671f#7",
    "https://anikototv.bz/watch/star-detective-precure-jjsd0#41",
    "https://anikototv.bz/watch/hataraku-saibou-necchuushou-moshimo-pocari-sweat-ga-attara-0ce40#1",
@@ -31,6 +31,7 @@
    "https://anikototv.bz/watch/kusuriya-no-hitorigoto-3rd-season#7",
    "https://anikototv.bz/watch/sorry-about-my-little-brothers-ee156#19",
    "https://anikototv.bz/watch/tougen-anki-nikko-kegon-falls-arc-c33e4#7",
+   "https://anikototv.bz/watch/space-warrior-baldios-f8092#32",
    "https://anikototv.bz/watch/space-warrior-baldios-f8092#14",
    "https://anikototv.bz/watch/toaru-anbu-no-item-efb8f#6",
    "https://anikototv.bz/watch/firefly-wedding-94459#6",
@@ -2366,6 +2367,7 @@
    "yt:video:JYMLwcwKAa8",
    "yt:video:FPnGxz2DeUk",
    "yt:video:QD7Ji9Dx954",
+   "yt:video:Jsu0oGRx1Xg",
    "yt:video:Ce62N8N1cxw",
    "yt:video:OOVOMc9bKRI",
    "yt:video:XvXkSo3Wh7w",
@@ -2380,7 +2382,6 @@
    "yt:video:bxVx8AAkOno",
    "yt:video:D1vR_-5ZJqU",
    "yt:video:Y9UlFxxlyL4",
-   "yt:video:1wsSASi_xQM",
    "yt:video:qc4USaonS8Q",
    "yt:video:l8O_8sp2jow",
    "yt:video:b9GVXnSOsI8",
@@ -2546,8 +2547,6 @@
    "yt:video:Co_xtD-xvJM",
    "yt:video:aDEJvbS9lvc",
    "yt:video:_fctDx6XbN8",
-   "yt:video:VxwjIp7Hj_E",
-   "yt:video:Y9tL2LgbVvw",
    "yt:video:7hb4vEEgU4E",
    "yt:video:VGh8DXmWpgc",
    "yt:video:kIH4N0A3M84",
@@ -2561,6 +2560,8 @@
    "yt:video:7vAGMbfxYTQ",
    "yt:video:4IV2l1Hf1gA",
    "yt:video:TaORb4oxxaY",
+   "yt:video:xtEveVRvWCQ",
+   "yt:video:jSSMfXd3vww",
    "yt:video:OGaAYP3NfBg",
    "yt:video:lXllSC4LlYE",
    "yt:video:Sw9fVghiPpk",
@@ -4354,6 +4355,11 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=156074",
+   "https://w1.anime4up.rest/?post_type=episode&p=156073",
+   "https://w1.anime4up.rest/?post_type=episode&p=156072",
+   "https://w1.anime4up.rest/?post_type=episode&p=156071",
+   "https://w1.anime4up.rest/?post_type=episode&p=156453",
    "https://w1.anime4up.rest/?post_type=episode&p=156070",
    "https://w1.anime4up.rest/?post_type=episode&p=156398",
    "https://w1.anime4up.rest/?post_type=episode&p=156069",
@@ -5664,12 +5670,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-15T05:38:27",
+ "last_run": "2026-11-15T06:39:36",
  "last_new": {
-  "youtube": "2026-11-15T05:38:00+03:00",
+  "youtube": "2026-11-15T06:39:14+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-15T04:37:05+03:00",
+  "anime4up": "2026-11-15T06:39:19+03:00",
   "stardima": "2026-11-14T20:51:05+03:00",
   "fitgirl": "2026-11-15T03:36:21+03:00",
   "topcinema": "2026-11-15T05:38:18+03:00",
@@ -5678,7 +5684,7 @@
   "carateen": "2026-11-13T20:25:55+03:00",
   "mycima-series": "2026-11-12T13:30:07+03:00",
   "github-stars": "2026-11-14T16:44:55+03:00",
-  "anikoto": "2026-11-15T05:38:02+03:00",
+  "anikoto": "2026-11-15T06:39:16+03:00",
   "laroza-series": "2026-11-15T03:36:16+03:00",
   "laroza-movies": "2026-11-15T03:36:19+03:00"
  },
