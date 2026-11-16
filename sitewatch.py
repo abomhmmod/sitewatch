@@ -231,16 +231,26 @@ def gh_get(path):
     return get(f'https://api.github.com/{path}', headers=hdr).json()
 
 
+BETA = re.compile(r'(?<![a-z])(?:alpha|beta|rc|pre|preview|prerelease|nightly|canary|dev|insiders?)(?![a-z])', re.I)
+
+
+def beta(r):
+    """هل الإصدار تجريبيّ: معلَّمٌ prerelease، أو في اسمه أو وسمه beta أو alpha أو rc وأمثالها."""
+    return bool(r.get('prerelease') or BETA.search(f"{r.get('name') or ''} {r.get('tag_name') or ''}"))
+
+
 def read_github_releases(src):
-    """إصدارات المستودعات المميّزة بنجمة. والمستودع المميّز حديثًا تُسجَّل إصداراته الحاليّة بلا إرسال."""
+    """إصدارات المستودعات المميّزة بنجمة. والمستودع المميّز حديثًا تُسجَّل إصداراته الحاليّة بلا إرسال،
+    والتجريبيّة تُسجَّل ولا تُرسل إن كان «stable_only»."""
     repos = gh_get(f"users/{src['user']}/starred?per_page=100")
 
     def releases(repo):
         rel = gh_get(f"repos/{repo['full_name']}/releases?per_page=5")
         return [{'key': f"{repo['full_name']}#{r['id']}", 'group': repo['full_name'],
                  'title': f"{repo['full_name']}: {clean(r.get('name') or r['tag_name'])}"
-                          + (' (تجريبيّ)' if r.get('prerelease') else ''),
-                 'url': r['html_url'], 'date': utc(r.get('published_at'))}
+                          + (' (تجريبيّ)' if beta(r) else ''),
+                 'url': r['html_url'], 'date': utc(r.get('published_at')),
+                 'quiet': bool(src.get('stable_only') and beta(r))}
                 for r in rel if not r.get('draft')]
 
     with ThreadPoolExecutor(6) as ex:
@@ -570,6 +580,16 @@ GROUP_GONE = re.compile(r'chat not found|not enough rights|not a forum|have no r
                         r'administrator rights|CHAT_WRITE_FORBIDDEN|bot is not a member|group chat was upgraded', re.I)
 
 
+def topic_key(src):
+    """مفتاح موضوع المصدر في المجموعة: «topic» إن ضُمّ إلى موضوع مصدرٍ آخر، وإلّا معرّفه."""
+    return src.get('topic') or src['id']
+
+
+def topic_title(src):
+    """اسم موضوع المصدر: «topic_name» إن كان (لموضوعٍ يجمع مصدرين)، وإلّا رمزه واسمه."""
+    return src.get('topic_name') or f"{src.get('icon', '🔔')} {src['name']}"
+
+
 class Group:
     """مجموعة المواضيع (السرّ TELEGRAM_GROUP_ID): موضوعٌ لكلّ موقع يصنعه البوت، و«حال المواقع» والتنبيهات في General.
     فإن لم تُضبط، أو رفضت الإرسال، وصل كلّ شيءٍ إلى المحادثة الخاصّة كما كان، مع تنبيهٍ واحد."""
@@ -584,6 +604,7 @@ class Group:
         if create:
             state['group'] = g
         self.g = g
+        self.titles = {}         # مفتاح الموضوع ← اسمه، من الإعداد (ensure_topics)
 
     @property
     def on(self):
@@ -608,21 +629,54 @@ class Group:
 
     def topic(self, src):
         """رقم موضوع الموقع (يُصنع إن لم يكن)، أو None لـ General، أو False إن رفضت المجموعة."""
-        sid = src['id']
+        sid = topic_key(src)
         if sid in self.g['topics'] or not self.create:
             return self.g['topics'].get(sid)
-        j = tg('createForumTopic', chat_id=self.id, name=f"{src.get('icon', '🔔')} {src['name']}"[:128])
+        name = self.titles.get(sid) or topic_title(src)
+        j = tg('createForumTopic', chat_id=self.id, name=name[:128])
         if not j.get('ok'):
             if self.refused(j):
                 return False
             print(f'تعذّر صنع موضوع {sid}:', j.get('description'))
             return None
         self.g['topics'][sid] = j['result']['message_thread_id']
+        self.g.setdefault('names', {})[sid] = name
         self.g['unpin'].append(sid)       # تيلغرام يثبّت أوّل رسالةٍ في الموضوع الجديد، فيُلغى تثبيتها بعدها
         return self.g['topics'][sid]
 
+    def drop(self, key):
+        """يحذف موضوعًا لم يعد مصدرٌ يرسل إليه (أُزيل مصدره أو ضُمّ إلى موضوعٍ آخر)، برسائله."""
+        tid = self.g['topics'][key]
+        j = tg('deleteForumTopic', chat_id=self.id, message_thread_id=tid)
+        if j.get('ok') or THREAD_GONE.search(j.get('description', '')):
+            print(f'حُذف موضوع {key} ({tid})')
+            self.g['topics'].pop(key)
+            self.g.get('names', {}).pop(key, None)
+            if key in self.g['unpin']:
+                self.g['unpin'].remove(key)
+        elif not self.refused(j):
+            print(f'تعذّر حذف موضوع {key}:', j.get('description'))
+
     def ensure_topics(self, cfg):
-        """مواضيع كلّ المواقع المفعّلة، بترتيب الإعداد، فتظهر كلّها من أوّل فحص (ومعها موضوع Shorts يوتيوب)."""
+        """يرتّب المواضيع على الإعداد: يحذف ما لا يرسل إليه مصدر، ويعيد تسمية ما تغيّر اسمه،
+        ويصنع موضوع كلّ موقعٍ مفعّل بترتيب الإعداد فتظهر كلّها من أوّل فحص."""
+        srcs = [s for src in cfg['sources'] for s in (src, shorts_of(src)) if s]
+        for s in srcs:      # اسم الموضوع من المصدر الذي يحمل مفتاحه، وإلّا من أوّل مصدرٍ يرسل إليه
+            if topic_key(s) == s['id'] or topic_key(s) not in self.titles:
+                self.titles[topic_key(s)] = topic_title(s)
+        keep = {topic_key(s) for s in srcs}     # والمصادر الموقوفة تبقى مواضيعها، فإن أُعيدت عادت إليها
+        for key in [k for k in self.g['topics'] if k not in keep]:
+            if self.on:
+                self.drop(key)
+        names = self.g.setdefault('names', {})
+        for key, tid in list(self.g['topics'].items()):
+            want = self.titles.get(key)
+            if want and names.get(key) != want and self.on:
+                j = tg('editForumTopic', chat_id=self.id, message_thread_id=tid, name=want[:128])
+                if j.get('ok') or 'NOT_MODIFIED' in j.get('description', ''):
+                    names[key] = want
+                elif not self.refused(j):
+                    print(f'تعذّرت تسمية موضوع {key}:', j.get('description'))
         for src in cfg['sources']:
             if src.get('enabled', True):
                 for s in (src, shorts_of(src)):
@@ -640,13 +694,13 @@ class Group:
             j = tg_post(self.id, text, preview, markup, silent, thread=tid)
             if j.get('ok'):
                 self.worked()
-                if tid and src['id'] in self.g['unpin']:
+                if tid and topic_key(src) in self.g['unpin']:
                     tg('unpinAllForumTopicMessages', chat_id=self.id, message_thread_id=tid)
-                    self.g['unpin'].remove(src['id'])
+                    self.g['unpin'].remove(topic_key(src))
                 return j['result']['message_id']
             if attempt == 1 and tid and THREAD_GONE.search(j.get('description', '')):
-                print(f'موضوع {src["id"]} حُذف، فيُصنع من جديد')
-                self.g['topics'].pop(src['id'], None)
+                print(f'موضوع {topic_key(src)} حُذف، فيُصنع من جديد')
+                self.g['topics'].pop(topic_key(src), None)
                 continue
             if self.refused(j):
                 break
@@ -841,7 +895,7 @@ def day_time(t):
 def shorts_of(src):
     """موضوع Shorts يوتيوب (إعداد «shorts» في مصدر يوتيوب): وجهة إرسالٍ فقط، ومفاتيحه وحاله في مصدر يوتيوب نفسه."""
     s = src.get('shorts') if src.get('type') == 'youtube' else None
-    if not s:
+    if not isinstance(s, dict):     # ولا موضوع لها إن لم تُضبط، أو كانت "skip" (لا تُرسل أصلًا)
         return None
     return {'id': s.get('id', src['id'] + '-shorts'), 'icon': s.get('icon', '📱'),
             'name': s.get('name', src['name'] + ' · Shorts'), 'type': 'youtube'}
@@ -849,7 +903,7 @@ def shorts_of(src):
 
 def send_new(cfg, src, items, out=None):
     """يرسل جديد مصدرٍ (الأقدم أوّلًا) بـ out(وجهة، نصّ): فيديوهات يوتيوب كلٌّ في رسالة بأزرارها،
-    والـShorts في موضوعها إن كان لها موضوع؛ وغيرها رسالةٌ للموقع."""
+    والـShorts في موضوعها إن كان لها موضوع، ولا تُرسل إن كان إعدادها "skip"؛ وغيرها رسالةٌ للموقع."""
     out = out or (lambda to, t, **k: tg_send(t, **k))
     ok = True
     if src['type'] != 'youtube':
@@ -860,9 +914,16 @@ def send_new(cfg, src, items, out=None):
     det = yt_details(items)
     shorts = shorts_of(src)
     parts = {}          # الوجهة ← فيديوهاتها، بترتيبها
+    skipped = 0
     for it in items:
-        to = shorts if shorts and (det.get(it['key'][9:]) or {}).get('short') else src
+        short = (det.get(it['key'][9:]) or {}).get('short')
+        if short and src.get('shorts') == 'skip':
+            skipped += 1        # تُسجَّل مع ما فُحص فلا تعود، ولا تُرسل
+            continue
+        to = shorts if shorts and short else src
         parts.setdefault(to['id'], (to, []))[1].append(it)
+    if skipped:
+        print(f'    Shorts متروكة: {skipped}')
     for to, part in parts.values():
         print(f"    {to['id']}: {len(part)}")
         if len(part) <= src.get('max_single', MAX_SINGLE):
@@ -984,6 +1045,7 @@ def run(args):
             # مجموعةٌ جديدة (قناة أو مستودع أُضيف): تُسجَّل عناصرها بلا إرسال
             fresh = [it for it in fresh if it['group'] in groups]
             groups |= {it['group'] for it in items}
+        fresh = [it for it in fresh if not it.get('quiet')]     # يُسجَّل ولا يُرسل (إصدارٌ تجريبيّ)
         revived = sid in state['off'] and src.get('enabled', True)    # مصدرٌ أُعيد بعد إيقافه: ما فاته قديم
         seed = not seen_list or revived
         if seed:
@@ -1055,7 +1117,8 @@ def send_recent(hours, dry=False):
         if not any(it.get('date') for it in items):
             undated.append(src['name'])
             continue
-        recent = sorted((it for it in items if it.get('date', '') >= cutoff), key=lambda it: it['date'])
+        recent = sorted((it for it in items if it.get('date', '') >= cutoff and not it.get('quiet')),
+                        key=lambda it: it['date'])
         print(f"✓ {src['id']}: {len(recent)} في آخر {hours_ar(hours)}")
         total += len(recent)
         if recent:
