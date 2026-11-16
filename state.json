@@ -1755,6 +1755,7 @@
    "yt:video:ROSbvwdcNbs",
    "yt:video:trB-44DO1r0",
    "yt:video:YMEbmy0Wr50",
+   "yt:video:EPCJ4i3bmBY",
    "yt:video:jJMKvH-LMN4",
    "yt:video:GC0dAsRl0ao",
    "yt:video:FuV1EOQUP9U",
@@ -1769,7 +1770,6 @@
    "yt:video:4RoLmhoLdRQ",
    "yt:video:uEpFWeXkZ3s",
    "yt:video:iJIPA0cYK_8",
-   "yt:video:Np7_mlvXFcA",
    "yt:video:ELn7iNd6NJ0",
    "yt:video:wFnfsyrXnL8",
    "yt:video:DUKzKCKL_ts",
@@ -5967,9 +5967,9 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-16T06:02:57",
+ "last_run": "2026-11-16T07:03:57",
  "last_new": {
-  "youtube": "2026-11-16T06:02:33+03:00",
+  "youtube": "2026-11-16T07:03:34+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-16T06:02:38+03:00",
