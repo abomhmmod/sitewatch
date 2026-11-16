@@ -675,6 +675,9 @@ class Group:
                 j = tg('editForumTopic', chat_id=self.id, message_thread_id=tid, name=want[:128])
                 if j.get('ok') or 'NOT_MODIFIED' in j.get('description', ''):
                     names[key] = want
+                elif THREAD_GONE.search(j.get('description', '')):
+                    print(f'موضوع {key} ({tid}) لم يعد في المجموعة، فيُنسى (ويُصنع إن أُرسل إليه)')
+                    self.g['topics'].pop(key)
                 elif not self.refused(j):
                     print(f'تعذّرت تسمية موضوع {key}:', j.get('description'))
         for src in cfg['sources']:
