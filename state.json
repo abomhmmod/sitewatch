@@ -3743,6 +3743,7 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:Srb-5JpzNqI",
    "yt:video:lFxqOK-rKNo",
    "yt:video:HzpIbLVgErY",
    "yt:video:7NfglPymAUM",
@@ -3757,7 +3758,6 @@
    "yt:video:5Op4FgQBN4Q",
    "yt:video:zLbrq6v6Zn4",
    "yt:video:soax67wUagE",
-   "yt:video:HdsWM1JLbgw",
    "yt:video:dOHqXKxA8UU",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
@@ -4423,7 +4423,6 @@
    "yt:video:Pzr3GkOhTqw"
   ],
   "filecr-mine": [
-   "windows-powershell@2026-11-11 09:38:20",
    "7-zip@2026-11-09 08:04:22",
    "subtitle-edit@2026-11-06 06:17:09",
    "qbittorrent@2026-10-21 07:03:55",
@@ -4432,6 +4431,7 @@
    "yt-dlp@2026-01-26 12:10:06",
    "internet-download-manager@2026-01-26 11:58:27",
    "honeyview@2025-10-06 10:54:04",
+   "windows-powershell@2026-11-11 09:38:20",
    "adobe-photoshop-download-0081@2026-11-13 07:47:01",
    "telegram-desktop@2026-11-12 07:29:56",
    "node-js@2026-11-12 07:16:53",
@@ -5977,9 +5977,9 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-16T10:50:39",
+ "last_run": "2026-11-16T11:02:57",
  "last_new": {
-  "youtube": "2026-11-16T10:48:16+03:00",
+  "youtube": "2026-11-16T10:59:59+03:00",
   "filecr-mine": "2026-11-13T11:02:48+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-16T09:47:08+03:00",
@@ -6011,7 +6011,6 @@
    "wco": 5,
    "anime4up": 6,
    "carateen": 7,
-   "stardima": 8,
    "topcinema": 9,
    "impractical-jokers": 10,
    "filecr-mine": 11,
@@ -6019,14 +6018,25 @@
    "mycima-movies": 13,
    "fitgirl": 14,
    "github-stars": 15,
-   "youtube-shorts": 83,
-   "laroza-series": 986,
-   "laroza-movies": 987
+   "laroza-series": 986
   },
   "unpin": [
    "impractical-jokers",
    "mycima-movies"
-  ]
+  ],
+  "names": {
+   "youtube": "📺 يوتيوب",
+   "anikoto": "🍥 Anikoto",
+   "wco": "🧸 WCO (كرتون)",
+   "anime4up": "🌸 انمي فور آب",
+   "carateen": "🎨 كراتين وستارديما",
+   "topcinema": "🎬 توب سينما",
+   "impractical-jokers": "😂 Impractical Jokers",
+   "filecr-mine": "💿 FileCR",
+   "fitgirl": "🎮 FitGirl Repacks",
+   "github-stars": "⭐ GitHub",
+   "laroza-series": "📡 لاروزا · مسلسلات وأفلام عربية"
+  }
  },
  "status_chat": "-1003928536381"
 }
