@@ -3817,6 +3817,8 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:_B1lbe5Fi1Y",
+   "yt:video:oEQEEtculHY",
    "yt:video:GteLm6I4mYc",
    "yt:video:I25z4WwIXBA",
    "yt:video:hVL0S-yenjw",
@@ -3830,8 +3832,6 @@
    "yt:video:e2J1x5btDqA",
    "yt:video:eYuj7JIF7_E",
    "yt:video:mMdjoe10PAw",
-   "yt:video:P6GmFQbixl4",
-   "yt:video:-w0fi7_x7Ro",
    "yt:video:dOHqXKxA8UU",
    "yt:video:wDU27f84hAs",
    "yt:video:pJoYBSGeyXs",
@@ -4500,9 +4500,9 @@
    "7-zip@2026-11-09 08:04:22",
    "mkvtoolnix@2026-10-19 09:36:11",
    "wemod@2026-06-19 07:44:06",
+   "internet-download-manager@2026-01-26 11:58:27",
    "microsoft-office-2021-2024@2026-05-28 13:35:05",
    "yt-dlp@2026-01-26 12:10:06",
-   "internet-download-manager@2026-01-26 11:58:27",
    "subtitle-edit@2026-11-06 06:17:09",
    "qbittorrent@2026-10-21 07:03:55",
    "honeyview@2025-10-06 10:54:04",
@@ -4542,6 +4542,8 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=156559",
+   "https://w1.anime4up.rest/?post_type=episode&p=156558",
    "https://w1.anime4up.rest/?post_type=episode&p=156557",
    "https://w1.anime4up.rest/?post_type=episode&p=156556",
    "https://w1.anime4up.rest/?post_type=episode&p=156555",
@@ -6259,12 +6261,12 @@
    "yt-dlp"
   ]
  },
- "last_run": "2026-11-17T09:09:01",
+ "last_run": "2026-11-17T10:12:38",
  "last_new": {
-  "youtube": "2026-11-17T09:06:00+03:00",
+  "youtube": "2026-11-17T10:09:38+03:00",
   "filecr-mine": "2026-11-16T12:04:33+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-17T08:02:22+03:00",
+  "anime4up": "2026-11-17T10:09:42+03:00",
   "stardima": "2026-11-17T01:53:55+03:00",
   "fitgirl": "2026-11-17T00:52:51+03:00",
   "topcinema": "2026-11-17T06:07:45+03:00",
