@@ -18,7 +18,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40     # فحص «أعمالي · أعمال فرعيّة» مرّةً في اليوم نحو 10 دقائق
     concurrency:
       group: sitewatch
       cancel-in-progress: false
@@ -94,6 +94,9 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
           YT_API_KEY: ${{ secrets.YT_API_KEY }}
+          MAL_CLIENT_ID: ${{ secrets.MAL_CLIENT_ID }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          MYWORKS: ${{ secrets.MYWORKS }}
           GITHUB_TOKEN: ${{ github.token }}
         run: python sitewatch.py
 

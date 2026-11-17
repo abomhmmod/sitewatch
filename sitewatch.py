@@ -14,9 +14,12 @@ SiteWatch — يفحص المواقع التي تتابعها، ويرسل جد�
   YT_CHANNELS                        احتياط: معرّفات قنوات (UC...)، إن لم تُقرأ الاشتراكات
   YT_CLIENT_ID و YT_CLIENT_SECRET و YT_REFRESH_TOKEN
                                      إذنك لحسابك في يوتيوب (auth_youtube.py): أزرار «أضف إلى قائمة» تحت كلّ فيديو
+  MAL_CLIENT_ID و TMDB_API_KEY       موضوع «أعمالي»: واجهتا MyAnimeList وTMDB
+  MYWORKS                            صورة قائمتيك في IMDb وما يُتابع منها (JSON، يبنيه myworks_build.py)
   GITHUB_TOKEN                       اختياريّ: يرفع حدّ طلبات واجهة GitHub
 """
 import argparse
+import hashlib
 import html
 import json
 import os
@@ -525,9 +528,297 @@ def read_stardima(src):
     return out
 
 
+# ------------------------------------------------------------------ أعمالي (أنمي، أفلام، مسلسلات)
+# لا يعرف موقعٌ واحدٌ كلّ ما يتّصل بسلاسلك، فهي ثلاثة مصادر في موضوعٍ واحد:
+#   mal_relations  أنمي أُعلن أو يُعرض الآن، مرتبطٌ في MAL بعملٍ في قائمتك وليس هو فيها
+#   tmdb_works     جزءٌ جديد في سلسلة أفلامٍ عندك، أو موسمٌ جديد لمسلسلٍ عندك (TMDB)
+#   wd_spinoffs    عملٌ فرعيّ أو تتمّة أو عملٌ من عالم عملٍ عندك (Wikidata)
+# وقائمتا IMDb خاصّتان لا تُقرآن من الخوادم، فصورتها في السرّ MYWORKS (JSON، يبنيه myworks_build.py).
+# والمستودع عامّ، فمفاتيح المصدرين الأخيرين في state.json مموّهة (hash)، ولا تُطبع عناوينها في السجلّ («private»).
+
+def myworks():
+    raw = os.environ.get('MYWORKS', '').strip()
+    return json.loads(raw) if raw else None
+
+
+def hide(salt, raw):
+    return 'h:' + hashlib.sha256(f'{salt}:{raw}'.encode()).hexdigest()[:16]
+
+
+def host(url):
+    return re.sub(r'^https?://([^/]+).*$', r'\1', url)
+
+
+def jget(url, params=None, headers=None, tries=3):
+    """طلب JSON لا يضع الرابط في رسالة الخطأ: فيه مفتاح TMDB، والسجلّ عامّ."""
+    err = ''
+    for n in range(tries):
+        try:
+            r = requests.get(url, params=params, headers={**UA, **(headers or {})}, timeout=40)
+        except requests.RequestException as e:
+            err = type(e).__name__
+        else:
+            if r.status_code == 200:
+                return r.json()
+            err = f'HTTP {r.status_code}'
+            if r.status_code == 404:
+                break
+            if r.status_code == 429:
+                time.sleep(min(int(r.headers.get('Retry-After') or 5), 60))
+        time.sleep(2 + 3 * n)
+    raise RuntimeError(f'{host(url)}: {err}')
+
+
+MAL_REL = {'sequel': 'تتمّة «{}»', 'prequel': 'سابقة «{}»', 'side_story': 'قصّةٌ جانبيّة من «{}»',
+           'spin_off': 'عملٌ فرعيّ من «{}»', 'alternative_version': 'نسخةٌ أخرى من «{}»',
+           'alternative_setting': 'من عالم «{}»', 'summary': 'ملخّص «{}»', 'parent_story': 'أصل «{}»',
+           'full_story': 'القصّة الكاملة لـ«{}»', 'other': 'مرتبطٌ بـ«{}»'}
+MAL_TYPE = {'tv': 'مسلسل', 'movie': 'فيلم', 'ova': 'OVA', 'ona': 'ONA', 'special': 'حلقةٌ خاصّة',
+            'tv_special': 'حلقةٌ خاصّة'}
+
+
+def when_ar(d, film=False):
+    if not d:
+        return 'لم يُحدَّد موعده'
+    soon = d > datetime.now().strftime('%Y-%m-%d')
+    return (('يُعرض ' if soon else 'عُرض ') if film else ('يبدأ ' if soon else 'بدأ ')) + d
+
+
+def read_mal_relations(src):
+    """أنمي «قادم» (ترتيب upcoming في MAL) أو من الموسمين الحاليّ والقادم، ليس في قائمتك، وفي روابطه عملٌ منها.
+    الروابط لا تأتي إلّا من صفحة العمل (طلبٌ لكلّ عمل)، فيُسجَّل غير المرتبط «quiet» ويُعاد فحصه كلّ 7 أيّام
+    (فقد يُربط بعد إعلانه)، وفي كلّ فحصٍ max_details صفحةً على الأكثر، وما بقي ففي الفحص التالي."""
+    cid = os.environ.get('MAL_CLIENT_ID', '').strip()
+    if not cid:
+        return None
+    H = {'X-MAL-CLIENT-ID': cid}
+    api = 'https://api.myanimelist.net/v2'
+
+    def pages(url, params):
+        out = []
+        while url:
+            j = jget(url, params, H)
+            out += [d['node'] for d in j.get('data', [])]
+            url, params = j.get('paging', {}).get('next'), None
+            time.sleep(0.5)
+        return out
+
+    mine = {a['id'] for a in pages(f"{api}/users/{src['user']}/animelist", {'limit': 1000, 'nsfw': 'true'})}
+    if not mine:
+        raise RuntimeError('قائمة MAL فارغة')
+    f = {'fields': 'start_date,media_type,alternative_titles', 'nsfw': 'true'}
+    cands = pages(f'{api}/anime/ranking', {'ranking_type': 'upcoming', 'limit': 500, **f})
+    now = datetime.now(timezone.utc)
+    seasons = ['winter', 'spring', 'summer', 'fall']
+    for k in (0, 3):
+        m = now.month - 1 + k
+        cands += pages(f"{api}/anime/season/{now.year + m // 12}/{seasons[(m % 12) // 3]}", {'limit': 500, **f})
+    known = src.get('_known') or set()
+    budget, day = src.get('max_details', 80), now.toordinal()
+    out, done = [], set()
+    for a in cands:
+        i = a['id']
+        if i in mine or i in done or a.get('media_type') in ('music', 'pv', 'cm'):
+            continue
+        done.add(i)
+        hit, quiet = f'mal:{i}', f'mal-q:{i}:{(day + i) // 7}'
+        title = (a.get('alternative_titles') or {}).get('en') or a['title']
+        if hit in known:
+            out.append({'key': hit, 'url': f'https://myanimelist.net/anime/{i}', 'title': title})
+            continue
+        if quiet in known:
+            out.append({'key': quiet, 'url': '', 'title': title, 'quiet': True})
+            continue
+        if budget <= 0:
+            continue
+        budget -= 1
+        d = jget(f'{api}/anime/{i}', {'fields': 'related_anime'}, H)
+        time.sleep(0.5)
+        rel = [r for r in d.get('related_anime', []) if r['node']['id'] in mine and r['relation_type'] in MAL_REL]
+        if not rel:
+            out.append({'key': quiet, 'url': '', 'title': title, 'quiet': True})
+            continue
+        r = min(rel, key=lambda r: list(MAL_REL).index(r['relation_type']))
+        kind = MAL_TYPE.get(a.get('media_type'))
+        out.append({'key': hit, 'url': f'https://myanimelist.net/anime/{i}',
+                    'title': f"{title}{f' ({kind})' if kind else ''} — "
+                             f"{MAL_REL[r['relation_type']].format(r['node']['title'])}"
+                             f" · {when_ar(a.get('start_date'), a.get('media_type') == 'movie')}"})
+    return out
+
+
+def read_tmdb_works(src):
+    """أجزاء سلاسل الأفلام (col) ومواسم المسلسلات (tv) التي في MYWORKS، من TMDB.
+    كلّ سلسلةٍ مجموعة (group)، فما يُضاف إلى MYWORKS لاحقًا يُسجَّل أوّل مرّةٍ بلا إرسال."""
+    key, w = os.environ.get('TMDB_API_KEY', '').strip(), myworks()
+    if not key or not w:
+        return None
+    salt, api = w['salt'], 'https://api.themoviedb.org/3'
+
+    def col(c):
+        j = jget(f'{api}/collection/{c}', {'api_key': key})
+        out = []
+        for p in j.get('parts', []):
+            d = p.get('release_date') or ''
+            out.append({'key': hide(salt, f"m:{p['id']}"), 'group': hide(salt, f'c:{c}'),
+                        'url': f"https://www.themoviedb.org/movie/{p['id']}",
+                        'title': f"{p.get('title', '')}{f' ({d[:4]})' if d else ''} (فيلم) — "
+                                 f"جزءٌ في «{j.get('name', '')}» · {when_ar(d, True)}"})
+        return out
+
+    def tv(t):
+        j = jget(f'{api}/tv/{t}', {'api_key': key})
+        return [{'key': hide(salt, f"s:{t}:{s['season_number']}"), 'group': hide(salt, f't:{t}'),
+                 'url': f"https://www.themoviedb.org/tv/{t}/season/{s['season_number']}",
+                 'title': f"{j.get('name', '')} (مسلسل) — الموسم {s['season_number']} · {when_ar(s.get('air_date'))}"}
+                for s in j.get('seasons', []) if s.get('season_number')]
+
+    jobs = [(col, c) for c in w.get('col', [])] + [(tv, t) for t in w.get('tv', [])]
+    out, fails = [], 0
+    with ThreadPoolExecutor(6) as ex:
+        for res in ex.map(lambda job: _try(*job), jobs):
+            if res is None:
+                fails += 1
+            else:
+                out += res
+    if fails > len(jobs) // 4:
+        raise RuntimeError(f'أخفق {fails} من {len(jobs)} طلبًا')
+    if fails:       # سلسلةٌ حُذفت من TMDB أو تعثّر طلبها: لا يُسقط الباقي (وما فاته يصل في الفحص التالي)
+        print(f'    TMDB: أخفق {fails} من {len(jobs)}')
+    return out
+
+
+def _try(fn, arg):
+    try:
+        return fn(arg)
+    except Exception:
+        return None
+
+
+WD_API = 'https://www.wikidata.org/w/api.php'
+WD_UA = {'User-Agent': 'SiteWatch/1.0 (https://github.com/abomhmmod/sitewatch)'}
+WD_FILM = {'Q11424', 'Q202866', 'Q506240', 'Q24869', 'Q229390', 'Q93204', 'Q1261214', 'Q24862', 'Q17517379',
+           'Q5398426', 'Q117467246', 'Q1259759', 'Q526877', 'Q581714', 'Q15416', 'Q21198342'}
+WD_TV = {'Q5398426', 'Q117467246', 'Q1259759', 'Q526877', 'Q15416', 'Q581714'}
+WD_SHORT = {'Q17517379', 'Q24862'}
+WD_ANIME = {'Q63952888', 'Q20650540', 'Q1107', 'Q220898', 'Q100269041', 'Q1047299'}
+WD_ADULT = {'Q185529', 'Q1414131', 'Q2412161'}
+
+
+def wd(**p):
+    p.update(format='json', maxlag='5')
+    for _ in range(5):
+        j = jget(WD_API, p, WD_UA)
+        if j.get('error', {}).get('code') != 'maxlag':
+            time.sleep(0.3)     # Wikidata يردّ 429 مع الطلبات المتوازية، فهي متتابعة
+            return j
+        time.sleep(5)
+    raise RuntimeError('wikidata: maxlag')
+
+
+def wd_search(expr):
+    out, off = [], 0
+    while off is not None and off < 2000:
+        j = wd(action='query', list='search', srsearch=expr, srlimit=500, sroffset=off, srnamespace=0)
+        out += [h['title'] for h in j['query']['search']]
+        off = j.get('continue', {}).get('sroffset')
+    return out
+
+
+def wd_entities(qids):
+    res, qids = {}, sorted(set(qids))
+    for n in range(0, len(qids), 50):
+        res.update(wd(action='wbgetentities', ids='|'.join(qids[n:n + 50]), props='claims|labels',
+                      languages='ar|en').get('entities', {}))
+    return res
+
+
+def wd_vals(e, p):
+    out = []
+    for c in (e or {}).get('claims', {}).get(p, []):
+        v = c['mainsnak'].get('datavalue', {}).get('value')
+        if isinstance(v, dict) and 'id' in v:
+            out.append(v['id'])
+        elif isinstance(v, dict) and 'time' in v:
+            out.append(v['time'][1:11])
+        elif isinstance(v, str):
+            out.append(v)
+    return out
+
+
+def wd_label(e, q):
+    lab = (e or {}).get('labels', {})
+    return (lab.get('ar') or lab.get('en') or {}).get('value', q)
+
+
+def read_wd_spinoffs(src):
+    """أعمالٌ مرتبطة بأعمالك (q في MYWORKS) في Wikidata: عملٌ مشتقّ (P4969) أو مبنيّ عليه (P144) من البلد نفسه،
+    أو تتمّة (P155/P156، لا بين مسلسلات: هي هناك جيران الموعد)، أو عضوٌ في امتيازه (P8345) أو سلسلته (P179).
+    الأنمي يتولّاه MAL، والحلقات والألعاب وما في قائمتيك تُسجَّل «quiet» فلا تُرسل ولا يُعاد جلبها."""
+    w = myworks()
+    if not w:
+        return None
+    salt, known = w['salt'], src.get('_known') or set()
+    imdb = {f'tt{i:07d}' for i in w['imdb']}
+    bad = {f'Q{i}' for i in w.get('bad', [])}
+    mine_q = [f'Q{i}' for i in w['q']]
+    mine = wd_entities(mine_q)
+    via = {}            # المرشّح ← [(عملك، نوع الصلة، المجموعة)]
+    groups = {}         # امتيازٌ أو سلسلة ← أعمالك فيه
+    for q, e in mine.items():
+        for x in wd_vals(e, 'P4969'):
+            via.setdefault(x, []).append((q, 'derivative', ''))
+        for x in wd_vals(e, 'P156') + wd_vals(e, 'P155'):
+            via.setdefault(x, []).append((q, 'follows', ''))
+        for g in wd_vals(e, 'P8345') + wd_vals(e, 'P179'):
+            if g not in bad:
+                groups.setdefault(g, set()).add(q)
+    hits = set()
+    gl = sorted(groups)
+    for prop, targets, per in (('P144', mine_q, 20), ('P155', mine_q, 20), ('P8345', gl, 10), ('P179', gl, 10)):
+        for n in range(0, len(targets), per):
+            hits |= set(wd_search('haswbstatement:' + '|'.join(f'{prop}={x}' for x in targets[n:n + per])))
+    cands = (set(via) | hits) - set(mine)
+    keys = {q: hide(salt, f'q:{q}') for q in cands}
+    if not known:       # أوّل فحص: كلّه قديمٌ يُسجَّل بلا إرسال، فلا تُجلب عناصره (نحو 200 طلب)
+        return [{'key': k, 'url': '', 'title': '', 'quiet': True} for k in keys.values()]
+    # ما سُجّل من قبل لا يُجلب ثانيةً
+    out = [{'key': keys[q], 'url': '', 'title': '', 'quiet': True} for q in cands if keys[q] in known]
+    for q, e in wd_entities([q for q in cands if keys[q] not in known]).items():
+        if q not in keys:       # تحويلةٌ إلى عنصرٍ آخر
+            continue
+        p31 = set(wd_vals(e, 'P31'))
+        ids = [i for i in wd_vals(e, 'P345') if i.startswith('tt')]
+        name = wd_label(e, q)
+        why = list(via.get(q, []))
+        why += [(s, 'derivative', '') for s in wd_vals(e, 'P144') if s in mine]
+        why += [(s, 'follows', '') for s in wd_vals(e, 'P155') + wd_vals(e, 'P156') if s in mine]
+        why += [(s, 'group', g) for g in wd_vals(e, 'P8345') + wd_vals(e, 'P179') for s in groups.get(g, ())]
+        ok = []
+        for s, kind, g in why:
+            se = mine.get(s)
+            if kind == 'derivative' and set(wd_vals(e, 'P495')) & set(wd_vals(se, 'P495')):
+                ok.append(s)
+            elif kind == 'follows' and not (p31 & WD_TV) and not (set(wd_vals(se, 'P31')) & WD_TV):
+                ok.append(s)
+            elif kind == 'group' and not (p31 & WD_SHORT and len(groups.get(g, ())) > 40):
+                ok.append(s)
+        dull = (not ok or not p31 & WD_FILM or p31 & WD_ANIME or set(wd_vals(e, 'P136')) & WD_ADULT
+                or re.search(r'\bXXX\b|porn', name, re.I) or set(ids) & imdb)
+        date = min(wd_vals(e, 'P577') + wd_vals(e, 'P580') or [''])
+        date = re.sub(r'(-00)+$', '', date)
+        kind = 'مسلسل' if p31 & WD_TV else 'فيلمٌ قصير' if p31 & WD_SHORT else 'فيلم'
+        out.append({'key': keys[q], 'quiet': bool(dull),
+                    'url': f'https://www.imdb.com/title/{ids[0]}/' if ids else f'https://www.wikidata.org/wiki/{q}',
+                    'title': f"{name} ({kind}) — من عالم «{wd_label(mine.get(ok[0]), ok[0]) if ok else ''}»"
+                             f" · {when_ar(date, not p31 & WD_TV)}"})
+    return out
+
+
 READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr_pages, 'carateen': read_carateen,
            'github_releases': read_github_releases, 'youtube': read_youtube, 'tvmaze': read_tvmaze,
-           'page_links': read_page_links, 'stardima': read_stardima}
+           'page_links': read_page_links, 'stardima': read_stardima,
+           'mal_relations': read_mal_relations, 'tmdb_works': read_tmdb_works, 'wd_spinoffs': read_wd_spinoffs}
 
 
 # ------------------------------------------------------------------ تيلغرام
@@ -1005,7 +1296,9 @@ def run(args):
     state.setdefault('groups', {})
     state.setdefault('last_new', {})
     state.setdefault('off', [])
+    state.setdefault('checked', {})
     send = not (args.dry or args.probe)
+    quiet_log = bool(os.environ.get('GITHUB_ACTIONS'))      # سجلّ GitHub عامّ: لا تُطبع فيه عناوين المصادر الخاصّة
     grp = Group(state)
     if send:
         grp.ensure_topics(cfg)
@@ -1019,6 +1312,10 @@ def run(args):
             continue
         seen_list = state['seen'].get(sid, [])
         seen = {same(k) for k in seen_list}
+        every, last = src.get('every_hours'), state['checked'].get(sid)
+        if every and last and not args.probe and seen_list and                 datetime.now().astimezone() - datetime.fromisoformat(last) < timedelta(hours=every, minutes=-10):
+            results[sid] = ('none', 0)      # لا يُفحص في كلّ نبضة (every_hours)
+            continue
         t0 = time.time()
         try:
             items = READERS[src['type']]({**src, '_known': seen})
@@ -1057,7 +1354,7 @@ def run(args):
         print(f'✓ {sid}: {len(items)} عنصرًا، الجديد {len(fresh)}'
               + (' (أُعيد بعد إيقافه: تسجيل فقط)' if revived else ' (أوّل فحص: تسجيل فقط)' if seed else '')
               + f' [{dt:.1f}s]')
-        if args.probe or args.dry:
+        if (args.probe or args.dry) and not (src.get('private') and quiet_log):
             for it in (items if args.probe else fresh)[:3 if args.probe else 50]:
                 print('    ', it['title'][:110], '|', it['url'][:90])
         results[sid] = ('seed', 0) if seed else ('new', len(fresh)) if fresh else ('none', 0)
@@ -1072,7 +1369,8 @@ def run(args):
             continue
         total += len(fresh)
         keys = [it['key'] for it in items] + [k for k in seen_list if same(k) not in uniq]
-        state['seen'][sid] = keys[:max(KEEP_KEYS, len(items))]
+        state['seen'][sid] = keys[:max(src.get('keep', KEEP_KEYS), len(items))]
+        state['checked'][sid] = datetime.now().astimezone().isoformat(timespec='seconds')
         if groups:
             state['groups'][sid] = sorted(groups)
         if revived:
@@ -1107,7 +1405,7 @@ def send_recent(hours, dry=False):
     out(f'🕒 ما نُشر في آخر {hours_ar(hours)}')
     undated, total = [], 0
     for src in cfg['sources']:
-        if not src.get('enabled', True):
+        if not src.get('enabled', True) or src.get('every_hours'):     # «أعمالي» لا تاريخ نشرٍ فيها
             continue
         try:
             items = READERS[src['type']](src)
