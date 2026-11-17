@@ -706,13 +706,19 @@ WD_ADULT = {'Q185529', 'Q1414131', 'Q2412161'}
 
 
 def wd(**p):
+    """طلبٌ إلى Wikidata. وإن ردّ «maxlag» (خوادمه متأخّرة) انتُظر حتّى دقيقة ونصف، ثمّ طُلب بلا maxlag:
+    هي قراءةٌ لا كتابة، والتأجيل لطفٌ لا شرط (أسقط أوّل فحصٍ على GitHub في 2026-11-18)."""
     p.update(format='json', maxlag='5')
-    for _ in range(5):
+    for n in range(7):
+        if n == 6:
+            p.pop('maxlag')
         j = jget(WD_API, p, WD_UA)
         if j.get('error', {}).get('code') != 'maxlag':
+            if 'error' in j:
+                raise RuntimeError(f"wikidata: {j['error'].get('code')}")
             time.sleep(0.3)     # Wikidata يردّ 429 مع الطلبات المتوازية، فهي متتابعة
             return j
-        time.sleep(5)
+        time.sleep(15)
     raise RuntimeError('wikidata: maxlag')
 
 
