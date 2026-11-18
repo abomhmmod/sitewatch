@@ -1634,13 +1634,13 @@
    "https://fitgirl-repacks.site/?p=83407"
   ],
   "github-stars": [
+   "SubtitleEdit/subtitleedit#449594506",
    "SubtitleEdit/subtitleedit#448403956",
    "SubtitleEdit/subtitleedit#446701903",
    "SubtitleEdit/subtitleedit#445321918",
    "SubtitleEdit/subtitleedit#443938304",
    "massgravel/Microsoft-Activation-Scripts#441474476",
    "massgravel/Microsoft-Activation-Scripts#441325515",
-   "SubtitleEdit/subtitleedit#441316821",
    "shinchiro/mpv-winbuild-cmake#441107716",
    "shinchiro/mpv-winbuild-cmake#439819075",
    "shinchiro/mpv-winbuild-cmake#438629095",
@@ -1710,6 +1710,7 @@
    "VoxelCubes/PanelCleaner#157871393",
    "zhongyang219/TrafficMonitor#83513204",
    "zhongyang219/TrafficMonitor#79055544",
+   "SubtitleEdit/subtitleedit#441316821",
    "SubtitleEdit/subtitleedit#440034669",
    "SubtitleEdit/subtitleedit#438801903",
    "SubtitleEdit/subtitleedit#438075845",
@@ -4704,17 +4705,17 @@
   "filecr-mine": [
    "7-zip@2026-11-09 08:04:22",
    "subtitle-edit@2026-11-06 06:17:09",
+   "qbittorrent@2026-10-21 07:03:55",
    "mkvtoolnix@2026-10-19 09:36:11",
    "wemod@2026-06-19 07:44:06",
+   "yt-dlp@2026-01-26 12:10:06",
    "internet-download-manager@2026-01-26 11:58:27",
    "honeyview@2025-10-06 10:54:04",
    "adobe-photoshop-download-0081@2026-11-13 07:47:01",
    "node-js@2026-11-12 07:16:53",
    "git-for-windows@2026-11-11 09:48:14",
    "windows-powershell@2026-11-11 09:38:20",
-   "qbittorrent@2026-10-21 07:03:55",
    "python-for-windows@2026-05-15 06:06:55",
-   "yt-dlp@2026-01-26 12:10:06",
    "microsoft-powertoys-for-windows-10@2026-11-09 09:25:13",
    "microsoft-office-2021-2024@2026-05-28 13:35:05",
    "mozilla-firefox@2026-11-17 06:55:22",
@@ -18993,7 +18994,7 @@
    "h:fff376405e78bddf"
   ]
  },
- "last_run": "2026-11-18T08:41:34",
+ "last_run": "2026-11-18T09:45:14",
  "last_new": {
   "youtube": "2026-11-18T06:31:31+03:00",
   "filecr-mine": "2026-11-18T04:22:21+03:00",
@@ -19052,26 +19053,26 @@
    "fitgirl": "🎮 FitGirl Repacks",
    "github-stars": "⭐ GitHub",
    "laroza-series": "📡 لاروزا · مسلسلات وأفلام عربية",
-   "myworks-anime": "🎬 أعمالي"
+   "myworks-anime": "My Works"
   }
  },
  "status_chat": "-1003928536381",
  "checked": {
-  "youtube": "2026-11-18T08:36:40+03:00",
-  "anikoto": "2026-11-18T08:36:41+03:00",
-  "wco": "2026-11-18T08:36:42+03:00",
-  "anime4up": "2026-11-18T08:36:42+03:00",
-  "stardima": "2026-11-18T08:36:50+03:00",
-  "topcinema": "2026-11-18T08:36:51+03:00",
-  "impractical-jokers": "2026-11-18T08:36:52+03:00",
-  "filecr-mine": "2026-11-18T08:39:33+03:00",
-  "laroza-series": "2026-11-18T08:39:34+03:00",
-  "laroza-movies": "2026-11-18T08:39:34+03:00",
-  "fitgirl": "2026-11-18T08:39:35+03:00",
-  "github-stars": "2026-11-18T08:39:37+03:00",
+  "youtube": "2026-11-18T09:42:16+03:00",
+  "anikoto": "2026-11-18T09:42:16+03:00",
+  "wco": "2026-11-18T09:42:17+03:00",
+  "anime4up": "2026-11-18T09:42:18+03:00",
+  "stardima": "2026-11-18T09:42:26+03:00",
+  "topcinema": "2026-11-18T09:42:28+03:00",
+  "impractical-jokers": "2026-11-18T09:42:29+03:00",
+  "filecr-mine": "2026-11-18T09:45:11+03:00",
+  "laroza-series": "2026-11-18T09:45:11+03:00",
+  "laroza-movies": "2026-11-18T09:45:12+03:00",
+  "fitgirl": "2026-11-18T09:45:13+03:00",
+  "github-stars": "2026-11-18T09:45:14+03:00",
   "myworks-anime": "2026-11-18T08:41:20+03:00",
   "myworks-tmdb": "2026-11-18T08:41:34+03:00",
-  "carateen": "2026-11-18T08:36:49+03:00",
+  "carateen": "2026-11-18T09:42:26+03:00",
   "myworks-spinoffs": "2026-11-18T04:25:33+03:00"
  }
 }
