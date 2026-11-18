@@ -705,19 +705,17 @@ WD_ANIME = {'Q63952888', 'Q20650540', 'Q1107', 'Q220898', 'Q100269041', 'Q104729
 WD_ADULT = {'Q185529', 'Q1414131', 'Q2412161'}
 
 
-WD_BUSY = ('maxlag', 'cirrussearch-too-busy-error')
+WD_BUSY = ('cirrussearch-too-busy-error', 'maxlag')
 WD_WAIT = {'left': 0}       # ما بقي من الانتظار في هذا الفحص (ثوانٍ)؛ يملؤه read_wd_spinoffs
 
 
 def wd(**p):
-    """طلبٌ إلى Wikidata. وإن ردّ أنّه مشغول («maxlag»: خوادمه متأخّرة، أو «cirrussearch-too-busy-error»:
-    البحث مزدحم) انتُظر ثمّ أُعيد، وآخرُ محاولةٍ بلا maxlag (قراءةٌ لا كتابة، والتأجيل لطفٌ لا شرط).
-    وللانتظار كلّه في الفحص الواحد حدٌّ، فإن نفد سقط الفحص وأُعيد في الساعة التالية
-    (أسقط أوّلَ فحصين على GitHub في 2026-11-18)."""
-    p.update(format='json', maxlag='5')
+    """طلبٌ إلى Wikidata، بلا maxlag: فهو قراءةٌ لا كتابة، وmaxlag في Wikidata يدخل فيه تأخّرُ خدمة الاستعلام
+    فيبقى عاليًا ساعاتٍ (أسقط ثلاثة فحوصٍ على GitHub في 2026-11-18). وإن ردّ أنّ البحث مزدحم
+    («cirrussearch-too-busy-error») انتُظر ثمّ أُعيد؛ وللانتظار كلّه في الفحص الواحد حدٌّ، فإن نفد سقط الفحص
+    وأُعيد في الساعة التالية."""
+    p.update(format='json')
     for n in range(6):
-        if n == 5:
-            p.pop('maxlag', None)
         j = jget(WD_API, p, WD_UA)
         code = j.get('error', {}).get('code')
         if code not in WD_BUSY:
