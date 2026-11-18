@@ -705,21 +705,32 @@ WD_ANIME = {'Q63952888', 'Q20650540', 'Q1107', 'Q220898', 'Q100269041', 'Q104729
 WD_ADULT = {'Q185529', 'Q1414131', 'Q2412161'}
 
 
+WD_BUSY = ('maxlag', 'cirrussearch-too-busy-error')
+WD_WAIT = {'left': 0}       # ما بقي من الانتظار في هذا الفحص (ثوانٍ)؛ يملؤه read_wd_spinoffs
+
+
 def wd(**p):
-    """طلبٌ إلى Wikidata. وإن ردّ «maxlag» (خوادمه متأخّرة) انتُظر حتّى دقيقة ونصف، ثمّ طُلب بلا maxlag:
-    هي قراءةٌ لا كتابة، والتأجيل لطفٌ لا شرط (أسقط أوّل فحصٍ على GitHub في 2026-11-18)."""
+    """طلبٌ إلى Wikidata. وإن ردّ أنّه مشغول («maxlag»: خوادمه متأخّرة، أو «cirrussearch-too-busy-error»:
+    البحث مزدحم) انتُظر ثمّ أُعيد، وآخرُ محاولةٍ بلا maxlag (قراءةٌ لا كتابة، والتأجيل لطفٌ لا شرط).
+    وللانتظار كلّه في الفحص الواحد حدٌّ، فإن نفد سقط الفحص وأُعيد في الساعة التالية
+    (أسقط أوّلَ فحصين على GitHub في 2026-11-18)."""
     p.update(format='json', maxlag='5')
-    for n in range(7):
-        if n == 6:
-            p.pop('maxlag')
+    for n in range(6):
+        if n == 5:
+            p.pop('maxlag', None)
         j = jget(WD_API, p, WD_UA)
-        if j.get('error', {}).get('code') != 'maxlag':
-            if 'error' in j:
-                raise RuntimeError(f"wikidata: {j['error'].get('code')}")
+        code = j.get('error', {}).get('code')
+        if code not in WD_BUSY:
+            if code:
+                raise RuntimeError(f'wikidata: {code}')
             time.sleep(0.3)     # Wikidata يردّ 429 مع الطلبات المتوازية، فهي متتابعة
             return j
-        time.sleep(15)
-    raise RuntimeError('wikidata: maxlag')
+        pause = 10 * (n + 1)
+        if WD_WAIT['left'] < pause:
+            break
+        WD_WAIT['left'] -= pause
+        time.sleep(pause)
+    raise RuntimeError(f'wikidata: {code}')
 
 
 def wd_search(expr):
@@ -764,6 +775,7 @@ def read_wd_spinoffs(src):
     w = myworks()
     if not w:
         return None
+    WD_WAIT['left'] = int(src.get('max_wait', 600))
     salt, known = w['salt'], src.get('_known') or set()
     imdb = {f'tt{i:07d}' for i in w['imdb']}
     bad = {f'Q{i}' for i in w.get('bad', [])}
