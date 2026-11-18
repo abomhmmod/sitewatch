@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-يبني السرّ MYWORKS لموضوع «أعمالي»: صورة قائمتيك في IMDb (لا تُقرآن من خوادم GitHub لأنّهما خاصّتان).
+يبني السرّ MYWORKS لموضوع «My Works»: صورة قائمتيك في IMDb (لا تُقرآن من خوادم GitHub لأنّهما خاصّتان).
 
   1. من IMDb صدّر القائمتين (Watchlist و«Plan to Watch»): في صفحة كلّ قائمة زرّ Export، فينزل ملفّ CSV.
   2. python myworks_build.py ملف1.csv ملف2.csv

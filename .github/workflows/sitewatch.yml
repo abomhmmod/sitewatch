@@ -18,7 +18,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 40     # فحص «أعمالي · أعمال فرعيّة» مرّةً في اليوم نحو 10 دقائق
+    timeout-minutes: 40     # فحص «My Works · أعمال فرعيّة» مرّةً في اليوم نحو 10 دقائق
     concurrency:
       group: sitewatch
       cancel-in-progress: false

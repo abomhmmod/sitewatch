@@ -14,7 +14,7 @@ SiteWatch — يفحص المواقع التي تتابعها، ويرسل جد�
   YT_CHANNELS                        احتياط: معرّفات قنوات (UC...)، إن لم تُقرأ الاشتراكات
   YT_CLIENT_ID و YT_CLIENT_SECRET و YT_REFRESH_TOKEN
                                      إذنك لحسابك في يوتيوب (auth_youtube.py): أزرار «أضف إلى قائمة» تحت كلّ فيديو
-  MAL_CLIENT_ID و TMDB_API_KEY       موضوع «أعمالي»: واجهتا MyAnimeList وTMDB
+  MAL_CLIENT_ID و TMDB_API_KEY       موضوع «My Works»: واجهتا MyAnimeList وTMDB
   MYWORKS                            صورة قائمتيك في IMDb وما يُتابع منها (JSON، يبنيه myworks_build.py)
   GITHUB_TOKEN                       اختياريّ: يرفع حدّ طلبات واجهة GitHub
 """
@@ -528,7 +528,7 @@ def read_stardima(src):
     return out
 
 
-# ------------------------------------------------------------------ أعمالي (أنمي، أفلام، مسلسلات)
+# ------------------------------------------------------------------ My Works (أنمي، أفلام، مسلسلات)
 # لا يعرف موقعٌ واحدٌ كلّ ما يتّصل بسلاسلك، فهي ثلاثة مصادر في موضوعٍ واحد:
 #   mal_relations  أنمي أُعلن أو يُعرض الآن، مرتبطٌ في MAL بعملٍ في قائمتك وليس هو فيها
 #   tmdb_works     جزءٌ جديد في سلسلة أفلامٍ عندك، أو موسمٌ جديد لمسلسلٍ عندك (TMDB)
@@ -1421,7 +1421,7 @@ def send_recent(hours, dry=False):
     out(f'🕒 ما نُشر في آخر {hours_ar(hours)}')
     undated, total = [], 0
     for src in cfg['sources']:
-        if not src.get('enabled', True) or src.get('every_hours'):     # «أعمالي» لا تاريخ نشرٍ فيها
+        if not src.get('enabled', True) or src.get('every_hours'):     # «My Works» لا تاريخ نشرٍ فيها
             continue
         try:
             items = READERS[src['type']](src)
