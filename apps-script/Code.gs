@@ -62,6 +62,7 @@ function handle_(cq, done, boards) {
       return;
     }
   }
+  if (/^m:/.test(cq.data || '')) { mail_(cq, done); return; }
   // p: أضف، u: احذف (زرّ «✅»). والأزرار القديمة «✅» بلا تراجع (x) تُترك كما هي.
   const m = /^([pu]):([\w-]+):([\w-]{11})$/.exec(cq.data || '');
   if (!m || done[cq.data]) { tg_('answerCallbackQuery', { callback_query_id: cq.id }); return; }
@@ -110,6 +111,29 @@ function handle_(cq, done, boards) {
   const thread = cq.message.message_thread_id || 0;
   const key = chat.id + '_' + thread;
   (boards[key] = boards[key] || { chat: chat.id, thread: thread, lines: [] }).lines.push(line);
+}
+
+/**
+ * أزرار MailWatch («🚫 ألغِ الاشتراك» و«⛔ احظر المرسل»، وبياناتها m:…) في البوت نفسه: هذا المشروع وحده يقرأ ضغطات
+ * البوت، فيمرّرها إلى نشر MailWatch (رابطه في Script Properties: MAILWATCH_URL)، وهو يعمل ويعدّل الأزرار.
+ */
+function mail_(cq, done) {
+  let note = '';
+  if (!done[cq.data]) {
+    done[cq.data] = true;
+    const url = PropertiesService.getScriptProperties().getProperty('MAILWATCH_URL');
+    try {
+      if (!url) throw new Error('لا MAILWATCH_URL');
+      const r = UrlFetchApp.fetch(url, {
+        method: 'post', contentType: 'application/json', payload: JSON.stringify({ data: cq.data }), muteHttpExceptions: true,
+      });
+      note = JSON.parse(r.getContentText()).note || '';
+    } catch (e) {
+      console.log('MailWatch: ' + e.message);
+      note = '⚠️ لم يردّ بوت البريد، أعد الضغط بعد قليل.';
+    }
+  }
+  tg_('answerCallbackQuery', { callback_query_id: cq.id, text: String(note).slice(0, 190) });
 }
 
 /** رسالة القوائم المثبّتة في الموضوع الذي ضُغط فيه: تُعدَّل بصمت، وتُرسل وتُثبَّت أوّل مرّة أو إن حُذفت. */
