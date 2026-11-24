@@ -4276,6 +4276,7 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:cQm0UudbKRE",
    "yt:video:RnC85C-20-Y",
    "yt:video:X0aDhh0we7E",
    "yt:video:2HLI7gMH4sI",
@@ -4290,7 +4291,6 @@
    "yt:video:BHC03x21Q3Y",
    "yt:video:8K1utQjBz_k",
    "yt:video:FQDG01yLf_Y",
-   "yt:video:hVvs8R5Dzkw",
    "yt:video:KPezcvpfkto",
    "yt:video:dOHqXKxA8UU",
    "yt:video:wDU27f84hAs",
@@ -20115,7 +20115,7 @@
  "fail": {
   "mycima-series": 33,
   "mycima-movies": 33,
-  "filecr-mine": 97
+  "filecr-mine": 98
  },
  "groups": {
   "github-stars": [
@@ -20751,9 +20751,9 @@
    "h:fff376405e78bddf"
   ]
  },
- "last_run": "2026-11-24T10:28:50",
+ "last_run": "2026-11-24T11:29:41",
  "last_new": {
-  "youtube": "2026-11-24T09:27:32+03:00",
+  "youtube": "2026-11-24T11:29:27+03:00",
   "filecr-mine": "2026-11-19T05:01:08+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-24T03:28:34+03:00",
@@ -20800,37 +20800,37 @@
    "mycima-movies"
   ],
   "names": {
-   "youtube": "📺 يوتيوب",
+   "youtube": "📺 YouTube",
    "anikoto": "🍥 Anikoto",
-   "wco": "🧸 WCO (كرتون)",
-   "anime4up": "🌸 انمي فور آب",
-   "carateen": "🎨 كراتين وستارديما",
-   "topcinema": "🎬 توب سينما",
+   "wco": "🧸 WCO Cartoons",
+   "anime4up": "🌸 Anime4up",
+   "carateen": "🎨 Carateen & Stardima",
+   "topcinema": "🎬 TopCinema",
    "impractical-jokers": "😂 Impractical Jokers",
    "filecr-mine": "💿 FileCR",
    "fitgirl": "🎮 FitGirl Repacks",
    "github-stars": "⭐ GitHub",
-   "laroza-series": "📡 لاروزا · مسلسلات وأفلام عربية",
+   "laroza-series": "📡 Laroza · Arabic Series & Movies",
    "myworks-anime": "🎬 My Works"
   }
  },
  "status_chat": "-1003928536381",
  "checked": {
-  "youtube": "2026-11-24T10:28:20+03:00",
-  "anikoto": "2026-11-24T10:28:21+03:00",
-  "wco": "2026-11-24T10:28:22+03:00",
-  "anime4up": "2026-11-24T10:28:23+03:00",
-  "stardima": "2026-11-24T10:28:29+03:00",
-  "topcinema": "2026-11-24T10:28:30+03:00",
-  "impractical-jokers": "2026-11-24T10:28:31+03:00",
+  "youtube": "2026-11-24T11:29:27+03:00",
+  "anikoto": "2026-11-24T11:29:28+03:00",
+  "wco": "2026-11-24T11:29:29+03:00",
+  "anime4up": "2026-11-24T11:29:29+03:00",
+  "stardima": "2026-11-24T11:29:36+03:00",
+  "topcinema": "2026-11-24T11:29:37+03:00",
+  "impractical-jokers": "2026-11-24T11:29:37+03:00",
   "filecr-mine": "2026-11-20T11:45:19+03:00",
-  "laroza-series": "2026-11-24T10:28:38+03:00",
-  "laroza-movies": "2026-11-24T10:28:38+03:00",
-  "fitgirl": "2026-11-24T10:28:39+03:00",
-  "github-stars": "2026-11-24T10:28:41+03:00",
+  "laroza-series": "2026-11-24T11:29:39+03:00",
+  "laroza-movies": "2026-11-24T11:29:39+03:00",
+  "fitgirl": "2026-11-24T11:29:40+03:00",
+  "github-stars": "2026-11-24T11:29:41+03:00",
   "myworks-anime": "2026-11-24T10:28:50+03:00",
   "myworks-tmdb": "2026-11-24T08:26:59+03:00",
-  "carateen": "2026-11-24T10:28:28+03:00",
+  "carateen": "2026-11-24T11:29:35+03:00",
   "myworks-spinoffs": "2026-11-24T06:24:40+03:00"
  }
 }
