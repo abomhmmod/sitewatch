@@ -3008,6 +3008,8 @@
    "yt:video:JYMLwcwKAa8",
    "yt:video:FPnGxz2DeUk",
    "yt:video:QD7Ji9Dx954",
+   "yt:video:MXl296EMt6U",
+   "yt:video:h3KeTnEMxlA",
    "yt:video:C_4xPBiTOso",
    "yt:video:uyIxPE7rHaE",
    "yt:video:vkcEWksB8ms",
@@ -3021,8 +3023,6 @@
    "yt:video:4aS9rGWYtdQ",
    "yt:video:c6fkmgXaLjo",
    "yt:video:Jm2abC8pcn4",
-   "yt:video:dWJRlJ1taYw",
-   "yt:video:HRbGSVtz0B4",
    "yt:video:qc4USaonS8Q",
    "yt:video:l8O_8sp2jow",
    "yt:video:b9GVXnSOsI8",
@@ -3721,6 +3721,7 @@
    "yt:video:NwFDonyI-go",
    "yt:video:pOLT585Bxtk",
    "yt:video:i_tmjqbYCmk",
+   "yt:video:oMKoA5EHprY",
    "yt:video:NovKgiCi9oY",
    "yt:video:KXCurR1etuk",
    "yt:video:KadCWhQ-m1k",
@@ -3735,7 +3736,6 @@
    "yt:video:6gwfA7ROKRM",
    "yt:video:RrC04XIKXMQ",
    "yt:video:hh41OTC9eCY",
-   "yt:video:IU47MZeTjTA",
    "yt:video:-R1kM9F6-bc",
    "yt:video:TU1Te9VrqH4",
    "yt:video:mJicnGqY7e0",
@@ -4079,6 +4079,7 @@
    "yt:video:TN3r3kS0VaI",
    "yt:video:3xyTFZFskLk",
    "yt:video:4j4-BeJ3juY",
+   "yt:video:M-Wkd9BPo6g",
    "yt:video:fkWVr_Y902E",
    "yt:video:DDgJqlYDadQ",
    "yt:video:4ITAyPHHR1w",
@@ -4093,7 +4094,6 @@
    "yt:video:ymVrwCqdzZc",
    "yt:video:HXwxYFzKNoU",
    "yt:video:Nsvyteou2DE",
-   "yt:video:-6IngiF690c",
    "yt:video:w0bT085NklQ",
    "yt:video:dLoJjdHhMko",
    "yt:video:L4ji6URD9X8",
@@ -4484,6 +4484,7 @@
    "yt:video:IbYr0RWYJ9g",
    "yt:video:zCE7Aab_j0w",
    "yt:video:YwNzreH5144",
+   "yt:video:95uWr5jIviA",
    "yt:video:w1d_qFMHz3Y",
    "yt:video:XcrWI_uTPCc",
    "yt:video:39k2504MMXU",
@@ -4498,7 +4499,7 @@
    "yt:video:lA08qAq1e3o",
    "yt:video:z0KH7-leLHM",
    "yt:video:0i0K1Sad6gM",
-   "yt:video:sGvjmx7sQC4",
+   "yt:video:03i0GIMYaD0",
    "yt:video:GrOgzTgzkMU",
    "yt:video:z58RrYvRJ7I",
    "yt:video:6DoocB5PMHg",
@@ -4513,7 +4514,6 @@
    "yt:video:_MLQ5XWDXfU",
    "yt:video:lu0CBjcynVg",
    "yt:video:2Dhls6uRiIE",
-   "yt:video:XGWkr3CXwr8",
    "yt:video:39Hc0MZtE4w",
    "yt:video:NKeZ_HRk_O8",
    "yt:video:Y1vEGsnNYek",
@@ -5003,6 +5003,7 @@
    "7-zip@2026-10-22 07:13:42"
   ],
   "anime4up": [
+   "https://w1.anime4up.rest/?post_type=episode&p=157550",
    "https://w1.anime4up.rest/?post_type=episode&p=157549",
    "https://w1.anime4up.rest/?post_type=episode&p=157548",
    "https://w1.anime4up.rest/?post_type=episode&p=157547",
@@ -5601,8 +5602,7 @@
    "https://w1.anime4up.rest/?post_type=episode&p=155181",
    "https://w1.anime4up.rest/?post_type=episode&p=155180",
    "https://w1.anime4up.rest/?post_type=episode&p=155179",
-   "https://w1.anime4up.rest/?post_type=episode&p=155991",
-   "https://w1.anime4up.rest/?post_type=episode&p=155988"
+   "https://w1.anime4up.rest/?post_type=episode&p=155991"
   ],
   "mycima-series": [
    "https://mycima.house/%d9%85%d8%b4%d8%a7%d9%87%d8%af%d8%a9-%d9%85%d8%b3%d9%84%d8%b3%d9%84-%d8%b3%d9%82%d9%81-%d8%a7%d9%84%d9%88%d8%a7%d9%84%d8%af-%d8%ac2-%d8%ad%d9%84%d9%82%d8%a9-12/",
@@ -20028,7 +20028,7 @@
  "fail": {
   "mycima-series": 33,
   "mycima-movies": 33,
-  "filecr-mine": 89
+  "filecr-mine": 90
  },
  "groups": {
   "github-stars": [
@@ -20664,12 +20664,12 @@
    "h:fff376405e78bddf"
   ]
  },
- "last_run": "2026-11-24T02:27:42",
+ "last_run": "2026-11-24T03:28:53",
  "last_new": {
-  "youtube": "2026-11-24T02:27:07+03:00",
+  "youtube": "2026-11-24T03:28:30+03:00",
   "filecr-mine": "2026-11-19T05:01:08+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
-  "anime4up": "2026-11-24T02:27:11+03:00",
+  "anime4up": "2026-11-24T03:28:34+03:00",
   "stardima": "2026-11-23T21:20:21+03:00",
   "fitgirl": "2026-11-24T02:27:27+03:00",
   "topcinema": "2026-11-23T23:23:39+03:00",
@@ -20729,21 +20729,21 @@
  },
  "status_chat": "-1003928536381",
  "checked": {
-  "youtube": "2026-11-24T02:27:07+03:00",
-  "anikoto": "2026-11-24T02:27:08+03:00",
-  "wco": "2026-11-24T02:27:09+03:00",
-  "anime4up": "2026-11-24T02:27:11+03:00",
-  "stardima": "2026-11-24T02:27:17+03:00",
-  "topcinema": "2026-11-24T02:27:18+03:00",
-  "impractical-jokers": "2026-11-24T02:27:19+03:00",
+  "youtube": "2026-11-24T03:28:30+03:00",
+  "anikoto": "2026-11-24T03:28:30+03:00",
+  "wco": "2026-11-24T03:28:31+03:00",
+  "anime4up": "2026-11-24T03:28:34+03:00",
+  "stardima": "2026-11-24T03:28:40+03:00",
+  "topcinema": "2026-11-24T03:28:42+03:00",
+  "impractical-jokers": "2026-11-24T03:28:43+03:00",
   "filecr-mine": "2026-11-20T11:45:19+03:00",
-  "laroza-series": "2026-11-24T02:27:24+03:00",
-  "laroza-movies": "2026-11-24T02:27:25+03:00",
-  "fitgirl": "2026-11-24T02:27:27+03:00",
-  "github-stars": "2026-11-24T02:27:28+03:00",
+  "laroza-series": "2026-11-24T03:28:49+03:00",
+  "laroza-movies": "2026-11-24T03:28:50+03:00",
+  "fitgirl": "2026-11-24T03:28:51+03:00",
+  "github-stars": "2026-11-24T03:28:53+03:00",
   "myworks-anime": "2026-11-24T01:26:22+03:00",
   "myworks-tmdb": "2026-11-24T02:27:42+03:00",
-  "carateen": "2026-11-24T02:27:16+03:00",
+  "carateen": "2026-11-24T03:28:40+03:00",
   "myworks-spinoffs": "2026-11-23T05:53:05+03:00"
  }
 }
