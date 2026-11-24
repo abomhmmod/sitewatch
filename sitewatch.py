@@ -54,6 +54,8 @@ def get(url, **kw):
     r = requests.get(url, headers={**UA, **kw.pop('headers', {})}, timeout=kw.pop('timeout', 40), **kw)
     if r.status_code in (403, 503) and ('Just a moment' in r.text or 'challenge' in r.text.lower()):
         raise Blocked(f'HTTP {r.status_code}: صفحة حماية')
+    if '/pw-verify' in r.url or '<title>Bot Detection</title>' in r.text[:600]:
+        raise Blocked('صفحة كشف البوتات')        # filecr منذ 2026-11-20: يحوّل كلّ طلبٍ آليّ إليها (ولا تُتجاوز)
     r.raise_for_status()
     return r
 
@@ -187,11 +189,19 @@ def read_filecr_pages(src):
     def safe(slug):
         try:
             return page(slug), None
+        except Blocked:
+            raise                   # صفحة الحماية تردّ على كلّ الصفحات: لا معنى لطلب الباقي
         except Exception as e:
             return None, f'{slug}: {e}'
 
+    try:        # طلبٌ واحد يكشف أنّ الموقع يرفض أو لا يردّ، فلا تُطلب الصفحات كلّها كلّ ساعة بلا فائدة
+        head = page(src['programs'][0]), None
+    except (Blocked, requests.ConnectionError, requests.Timeout):
+        raise
+    except Exception as e:
+        head = None, f"{src['programs'][0]}: {e}"
     with ThreadPoolExecutor(6) as ex:
-        res = list(ex.map(safe, src['programs']))
+        res = [head] + list(ex.map(safe, src['programs'][1:]))
     fails = [e for _, e in res if e]
     if len(fails) == len(res):
         raise RuntimeError(f'كلّ البرامج أخفقت، أوّلها {fails[0]}')
