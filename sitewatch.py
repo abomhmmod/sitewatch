@@ -210,6 +210,39 @@ def read_filecr_pages(src):
     return sorted((it for it, _ in res if it), key=lambda x: x['date'], reverse=True)
 
 
+WINGET_INDEX = 'https://cdn.winget.microsoft.com/cache/source2.msix'
+
+
+def read_winget(src):
+    """آخر نسخةٍ من برامج بعينها في فهرس winget الرسميّ (مستودع مايكروسوفت المفتوح، يُحدَّث مرّاتٍ في اليوم):
+    ملفٌّ واحد من شبكة مايكروسوفت (نحو 4 ميغا، بلا مفتاح ولا حماية) فيه قاعدة index.db وجدولها packages
+    (المعرّف، الاسم، أعلى نسخة). و«packages» في الإعداد: معرّف winget ← [الاسم المعروض، صفحة البرنامج الرسميّة].
+    المفتاح المعرّف مع النسخة؛ والبرنامج المضاف حديثًا تُسجَّل نسخته الحاليّة بلا إرسال (group).
+    ومعرّفٌ لم يعد في الفهرس (غُيّر اسمه) يُذكر مرّةً واحدة ولا يوقف الباقي."""
+    import io
+    import sqlite3
+    import zipfile
+    want = src['packages']
+    with zipfile.ZipFile(io.BytesIO(get(src.get('url', WINGET_INDEX), timeout=120).content)) as z:
+        raw = z.read(next(n for n in z.namelist() if n.endswith('index.db')))
+    db = sqlite3.connect(':memory:')
+    try:
+        db.deserialize(raw)
+        rows = dict(db.execute('SELECT id, latest_version FROM packages WHERE id IN (%s)' % ','.join('?' * len(want)),
+                               list(want)))
+    finally:
+        db.close()
+    if not rows:
+        raise ValueError('لا برنامج من القائمة في فهرس winget')
+    out = []
+    for pid, (name, link) in want.items():
+        ver = rows.get(pid)
+        out.append({'key': f'{pid}@{ver}', 'group': pid, 'title': f'{name} {ver}', 'url': link, 'date': ''} if ver else
+                   {'key': f'{pid}@gone', 'group': pid, 'url': 'https://github.com/microsoft/winget-pkgs', 'date': '',
+                    'title': f'{name}: لم يعد معرّفه ({pid}) في فهرس winget، فتوقّفت متابعته حتّى يُصحَّح في الإعداد'})
+    return out
+
+
 def read_carateen(src):
     """carateen يكتب صفحته بالجافاسكربت وبياناته مشفّرة، فيُقرأ بمتصفّح خفيّ: روابط الحلقات /watch/sp/<العمل>/<الحلقة>."""
     from playwright.sync_api import sync_playwright
@@ -841,7 +874,8 @@ def read_wd_spinoffs(src):
     return out
 
 
-READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr_pages, 'carateen': read_carateen,
+READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr_pages, 'winget': read_winget,
+           'carateen': read_carateen,
            'github_releases': read_github_releases, 'youtube': read_youtube, 'tvmaze': read_tvmaze,
            'page_links': read_page_links, 'stardima': read_stardima,
            'mal_relations': read_mal_relations, 'tmdb_works': read_tmdb_works, 'wd_spinoffs': read_wd_spinoffs}
