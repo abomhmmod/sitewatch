@@ -29,7 +29,7 @@
        "qBittorrent.qBittorrent": ["qBittorrent", "https://www.qbittorrent.org/download"], "nomacs.nomacs": ["nomacs", "https://github.com/nomacs/nomacs/releases/latest"],
        "yt-dlp.yt-dlp": ["yt-dlp", "https://github.com/yt-dlp/yt-dlp/releases/latest"], "Tonec.InternetDownloadManager": ["Internet Download Manager", "https://www.internetdownloadmanager.com/download.html"],
        "WeMod.WeMod": ["WeMod", "https://www.wemod.com/download"], "Git.Git": ["Git", "https://git-scm.com/download/win"],
-       "OpenJS.NodeJS.LTS": ["Node.js LTS", "https://nodejs.org/en/download"], "Python.Python.3.14": ["Python", "https://www.python.org/downloads/windows/"],
+       "OpenJS.NodeJS.LTS": ["Node.js LTS", "https://nodejs.org/en/download"], "Python.Python.3.15": ["Python", "https://www.python.org/downloads/windows/"],
        "Microsoft.PowerShell": ["PowerShell", "https://github.com/PowerShell/PowerShell/releases/latest"], "Microsoft.PowerToys": ["PowerToys", "https://github.com/microsoft/PowerToys/releases/latest"],
        "Devolutions.UniGetUI": ["UniGetUI", "https://github.com/Devolutions/UniGetUI/releases/latest"], "Mega.MEGASync": ["MEGAsync", "https://mega.io/desktop"],
        "Proton.ProtonVPN": ["Proton VPN", "https://protonvpn.com/download-windows"], "Valve.Steam": ["Steam", "https://store.steampowered.com/about/"],
