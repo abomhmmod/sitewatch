@@ -1,6 +1,7 @@
 {
  "seen": {
   "anikoto": [
+   "https://anikototv.bz/watch/nerima-daikon-brothers-0c668#12",
    "https://anikototv.bz/watch/touch-3d6a4#56",
    "https://anikototv.bz/watch/the-guardian-of-daxia-2d496#19",
    "https://anikototv.bz/watch/white-cat-legend-season-3-0142a#14",
@@ -851,6 +852,11 @@
    "https://carateen.tv/watch/sp/61692496/74741105"
   ],
   "topcinema": [
+   "https://topcinemaa.tv/?p=262534",
+   "https://topcinemaa.tv/?p=262528",
+   "https://topcinemaa.tv/?p=262527",
+   "https://topcinemaa.tv/?p=262526",
+   "https://topcinemaa.tv/?p=262525",
    "https://topcinemaa.tv/?p=262607",
    "https://topcinemaa.tv/?p=262606",
    "https://topcinemaa.tv/?p=262605",
@@ -861,11 +867,9 @@
    "https://topcinemaa.tv/?p=262539",
    "https://topcinemaa.tv/?p=262596",
    "https://topcinemaa.tv/?p=262594",
-   "https://topcinemaa.tv/?p=262526",
    "https://topcinemaa.tv/?p=262590",
    "https://topcinemaa.tv/?p=262589",
    "https://topcinemaa.tv/?p=262587",
-   "https://topcinemaa.tv/?p=262525",
    "https://topcinemaa.tv/?p=262582",
    "https://topcinemaa.tv/?p=262581",
    "https://topcinemaa.tv/?p=262580",
@@ -1447,10 +1451,7 @@
    "https://topcinemaa.one/?p=261716",
    "https://topcinemaa.one/?p=261706",
    "https://topcinemaa.one/?p=261702",
-   "https://topcinemaa.one/?p=261701",
-   "https://topcinemaa.one/?p=261699",
-   "https://topcinemaa.one/?p=261697",
-   "https://topcinemaa.one/?p=261695"
+   "https://topcinemaa.one/?p=261701"
   ],
   "impractical-jokers": [
    "3704012",
@@ -2682,6 +2683,7 @@
    "yt:video:6DJBExeh94w",
    "yt:video:_NsobjWpIZg",
    "yt:video:2n5h3VFdxSE",
+   "yt:video:cc4Hk-9wz8I",
    "yt:video:C9Ku2L42AYE",
    "yt:video:nsxPqMsPGYs",
    "yt:video:_d1ahHWRG64",
@@ -2696,7 +2698,6 @@
    "yt:video:ahpfU39dK70",
    "yt:video:5qxjydUdCu8",
    "yt:video:TclB55y-nGU",
-   "yt:video:nmYxMwIYb7I",
    "yt:video:cc5C8hRblBY",
    "yt:video:KTDJiVpSDTI",
    "yt:video:hdMszZ2ah5Q",
@@ -3522,6 +3523,7 @@
    "yt:video:qTS2rWC-Rtw",
    "yt:video:-znvClaC23A",
    "yt:video:8ZhqVdj3A4k",
+   "yt:video:5_SpI-JngnM",
    "yt:video:UKMcgcLTnTI",
    "yt:video:5QD7Yy09KgI",
    "yt:video:vhtK_Mk5_9s",
@@ -3536,7 +3538,6 @@
    "yt:video:ntqPX1PfBmU",
    "yt:video:uYn10kWvomY",
    "yt:video:n6RbFdh99mM",
-   "yt:video:CbZG2du0al4",
    "yt:video:uehtHmqqXQo",
    "yt:video:ajZY0a6F3NY",
    "yt:video:MhKQvSCzUl4",
@@ -4308,6 +4309,8 @@
    "yt:video:bIwX4QuL90k",
    "yt:video:rTgwZR3T_uo",
    "yt:video:y2lkVlB96y4",
+   "yt:video:o90Q--WhvlI",
+   "yt:video:R4aPbFmCtM8",
    "yt:video:4vt9VJrZIAI",
    "yt:video:GbH0CCBEvuU",
    "yt:video:70-qGuph4GA",
@@ -4321,8 +4324,6 @@
    "yt:video:ZxlNDcE2NbE",
    "yt:video:UDqf6Oxfg_k",
    "yt:video:18BHBgnHl1M",
-   "yt:video:KHEWlrRvyX4",
-   "yt:video:wKIMgN_jWsQ",
    "yt:video:KPezcvpfkto",
    "yt:video:dOHqXKxA8UU",
    "yt:video:wDU27f84hAs",
@@ -4987,6 +4988,10 @@
    "yt:video:geWD3sV-mmQ",
    "yt:video:WfTLuDlcGYQ",
    "yt:video:Pzr3GkOhTqw",
+   "yt:video:nmYxMwIYb7I",
+   "yt:video:CbZG2du0al4",
+   "yt:video:KHEWlrRvyX4",
+   "yt:video:wKIMgN_jWsQ",
    "yt:video:zGnwlUfnLOg",
    "yt:video:_Qv0Sx2cf7A",
    "yt:video:C5L72WZJE5w",
@@ -19964,7 +19969,7 @@
   ]
  },
  "fail": {
-  "filecr-mine": 125
+  "filecr-mine": 126
  },
  "groups": {
   "github-stars": [
@@ -20629,21 +20634,21 @@
    "yt-dlp.yt-dlp"
   ]
  },
- "last_run": "2026-11-25T13:53:10",
+ "last_run": "2026-11-25T14:54:14",
  "last_new": {
-  "youtube": "2026-11-25T13:52:45+03:00",
+  "youtube": "2026-11-25T14:53:51+03:00",
   "filecr-mine": "2026-11-19T05:01:08+03:00",
   "egydead": "2026-11-09T11:16:39+03:00",
   "anime4up": "2026-11-25T11:50:25+03:00",
   "stardima": "2026-11-24T15:34:17+03:00",
   "fitgirl": "2026-11-25T06:01:20+03:00",
-  "topcinema": "2026-11-25T08:07:37+03:00",
+  "topcinema": "2026-11-25T14:54:06+03:00",
   "mycima-movies": "2026-11-09T18:26:32+03:00",
   "wco": "2026-11-25T01:12:24+03:00",
   "carateen": "2026-11-23T20:18:34+03:00",
   "mycima-series": "2026-11-25T12:51:43+03:00",
   "github-stars": "2026-11-24T12:30:47+03:00",
-  "anikoto": "2026-11-25T13:52:47+03:00",
+  "anikoto": "2026-11-25T14:53:55+03:00",
   "laroza-series": "2026-11-25T02:58:00+03:00",
   "laroza-movies": "2026-11-25T02:58:02+03:00",
   "myworks-anime": "2026-11-18T21:24:32+03:00",
@@ -20693,24 +20698,24 @@
  },
  "status_chat": "-1003928536381",
  "checked": {
-  "youtube": "2026-11-25T13:52:45+03:00",
-  "anikoto": "2026-11-25T13:52:47+03:00",
-  "wco": "2026-11-25T13:52:48+03:00",
-  "anime4up": "2026-11-25T13:52:49+03:00",
-  "stardima": "2026-11-25T13:52:56+03:00",
-  "topcinema": "2026-11-25T13:52:58+03:00",
-  "impractical-jokers": "2026-11-25T13:52:59+03:00",
+  "youtube": "2026-11-25T14:53:51+03:00",
+  "anikoto": "2026-11-25T14:53:55+03:00",
+  "wco": "2026-11-25T14:53:56+03:00",
+  "anime4up": "2026-11-25T14:53:56+03:00",
+  "stardima": "2026-11-25T14:54:03+03:00",
+  "topcinema": "2026-11-25T14:54:06+03:00",
+  "impractical-jokers": "2026-11-25T14:54:07+03:00",
   "filecr-mine": "2026-11-20T11:45:19+03:00",
-  "laroza-series": "2026-11-25T13:53:06+03:00",
-  "laroza-movies": "2026-11-25T13:53:07+03:00",
-  "fitgirl": "2026-11-25T13:53:08+03:00",
-  "github-stars": "2026-11-25T13:53:10+03:00",
+  "laroza-series": "2026-11-25T14:54:11+03:00",
+  "laroza-movies": "2026-11-25T14:54:12+03:00",
+  "fitgirl": "2026-11-25T14:54:12+03:00",
+  "github-stars": "2026-11-25T14:54:14+03:00",
   "myworks-anime": "2026-11-25T12:51:57+03:00",
   "myworks-tmdb": "2026-11-25T09:09:25+03:00",
-  "carateen": "2026-11-25T13:52:55+03:00",
+  "carateen": "2026-11-25T14:54:02+03:00",
   "myworks-spinoffs": "2026-11-25T07:06:45+03:00",
-  "winget-mine": "2026-11-25T13:53:03+03:00",
-  "mycima-series": "2026-11-25T13:53:05+03:00",
-  "mycima-movies": "2026-11-25T13:53:05+03:00"
+  "winget-mine": "2026-11-25T14:54:08+03:00",
+  "mycima-series": "2026-11-25T14:54:10+03:00",
+  "mycima-movies": "2026-11-25T14:54:10+03:00"
  }
 }
