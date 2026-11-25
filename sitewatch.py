@@ -64,6 +64,14 @@ def clean(t):
     return re.sub(r'\s+', ' ', html.unescape(t or '')).strip()
 
 
+def title_key(t):
+    """مفتاح العنصر من عنوانه (key: title): للموقع الذي يبدّل رقم رابط العمل نفسه (لاروزا)، فلا يُعدّ العمل جديدًا
+    برقمه الجديد. يُهمل التشكيل وصور الألف والياء والتاء وعلامات الترقيم والمسافات، فلا يفرّق بين كتابتين للعنوان."""
+    t = re.sub(r'[ً-ٰٟـ]', '', (t or '').lower())
+    t = t.translate(str.maketrans('أإآىة', 'اااي' + 'ه'))
+    return 't:' + re.sub(r'[\W_]+', ' ', t).strip()
+
+
 def utc(t):
     """تاريخ النشر بتوقيت UTC بصيغة ISO، من أيّ صيغةٍ شائعة؛ أو '' إن لم يُعرف."""
     t = clean(t)
@@ -489,7 +497,8 @@ def read_tvmaze(src):
 def read_page_links(src):
     """صفحة عاديّة: روابطها التي تطابق نمطًا (pattern)، ومعها pages صفحةً إن ذُكرت.
     title_sel: إن ذُكر أُخذ العنوان من هذا العنصر داخل الرابط، لا من نصّ الرابط كلّه.
-    title_attr: إن ذُكر أُخذ العنوان من سمة الرابط هذه (title مثلًا)، لا من نصّه."""
+    title_attr: إن ذُكر أُخذ العنوان من سمة الرابط هذه (title مثلًا)، لا من نصّه.
+    key: title: يُعرف العنصر بعنوانه لا برابطه (title_key)."""
     from bs4 import BeautifulSoup
     r = get(src['url'])
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -500,6 +509,7 @@ def read_page_links(src):
         raise ValueError(f'لا روابط تطابق النمط. العنوان: {clean(soup.title.string if soup.title else "")!r}، '
                          f'الرابط النهائيّ: {r.url}، الحجم: {len(r.text)}، أمثلة: {sample}')
     out, seen = [], set()
+    by_title = src.get('key') == 'title'
 
     def collect(soup):
         n = 0
@@ -512,9 +522,10 @@ def read_page_links(src):
                 text = clean(el.get_text()) if el else ''
             else:
                 text = clean(a.get_text())
-            if pat.search(href) and text and href not in seen:
-                seen.add(href)
-                out.append({'key': href, 'title': text, 'url': href})
+            key = title_key(text) if by_title else href
+            if pat.search(href) and text and key not in seen:
+                seen.add(key)
+                out.append({'key': key, 'title': text, 'url': href})
                 n += 1
         return n
 
@@ -1407,12 +1418,15 @@ def run(args):
             groups |= {it['group'] for it in items}
         fresh = [it for it in fresh if not it.get('quiet')]     # يُسجَّل ولا يُرسل (إصدارٌ تجريبيّ)
         revived = sid in state['off'] and src.get('enabled', True)    # مصدرٌ أُعيد بعد إيقافه: ما فاته قديم
-        seed = not seen_list or revived
+        # مصدرٌ صار يُعرف عنصره بعنوانه (key: title) وسجلّه كلّه روابط: كلّ ما في الصفحة «جديد» بمفتاحه الجديد
+        rekeyed = src.get('key') == 'title' and bool(seen_list) and not any(k.startswith('t:') for k in seen_list)
+        seed = not seen_list or revived or rekeyed
         if seed:
-            fresh = []          # أوّل فحصٍ للمصدر، أو أوّل فحصٍ بعد إعادته: تسجيلٌ بلا إرسال
+            fresh = []          # أوّل فحصٍ للمصدر، أو أوّل فحصٍ بعد إعادته أو بعد تبديل مفتاحه: تسجيلٌ بلا إرسال
         dt = time.time() - t0
         print(f'✓ {sid}: {len(items)} عنصرًا، الجديد {len(fresh)}'
-              + (' (أُعيد بعد إيقافه: تسجيل فقط)' if revived else ' (أوّل فحص: تسجيل فقط)' if seed else '')
+              + (' (أُعيد بعد إيقافه: تسجيل فقط)' if revived else ' (تبدّل مفتاحه إلى العنوان: تسجيل فقط)' if rekeyed
+                 else ' (أوّل فحص: تسجيل فقط)' if seed else '')
               + f' [{dt:.1f}s]')
         if (args.probe or args.dry) and not (src.get('private') and quiet_log):
             for it in (items if args.probe else fresh)[:3 if args.probe else 50]:
