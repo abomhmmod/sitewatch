@@ -2,7 +2,8 @@
   "playlists": "all",
   "sources": [
     {"id": "youtube", "icon": "📺", "name": "YouTube", "topic_name": "📺 YouTube", "type": "youtube", "preview": true, "fail_alert": 24, "max_single": 60,
-     "shorts": "skip", "_shorts": "الـShorts لا تُرسل (قرار المستخدم 2026-11-16)، وحُذف موضوعها"},
+     "shorts": "skip", "_shorts": "الـShorts لا تُرسل (قرار المستخدم 2026-11-16)، وحُذف موضوعها",
+     "keep": 6000, "_keep": "ضعف ما في الفحص الواحد (193 قناة × 15): قناةٌ لم يُجب عنها يوتيوب في فحصٍ لا تُنسى مفاتيحها فلا يعود قديمها جديدًا (2026-11-24)"},
     {"id": "anikoto", "icon": "🍥", "name": "Anikoto", "type": "anikoto",
      "url": "https://anikototv.to/filter?keyword=&type=&language%5B%5D=sub&sort=latest-updated"},
     {"id": "wco", "icon": "🧸", "name": "WCO Cartoons", "topic_name": "🧸 WCO Cartoons", "type": "rss", "url": "https://www.wco.tv/feed/", "pages_hours": 3,
