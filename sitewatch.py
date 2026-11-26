@@ -54,8 +54,6 @@ def get(url, **kw):
     r = requests.get(url, headers={**UA, **kw.pop('headers', {})}, timeout=kw.pop('timeout', 40), **kw)
     if r.status_code in (403, 503) and ('Just a moment' in r.text or 'challenge' in r.text.lower()):
         raise Blocked(f'HTTP {r.status_code}: صفحة حماية')
-    if '/pw-verify' in r.url or '<title>Bot Detection</title>' in r.text[:600]:
-        raise Blocked('صفحة كشف البوتات')        # filecr منذ 2026-11-20: يحوّل كلّ طلبٍ آليّ إليها (ولا تُتجاوز)
     r.raise_for_status()
     return r
 
@@ -165,89 +163,6 @@ def read_anikoto(src):
         ep = clean(sub.get_text()) if sub else ''
         out.append({'key': f'{base}#{ep}', 'title': f'{clean(a.get_text())} — الحلقة {ep}' if ep else clean(a.get_text()),
                     'url': f'{base}/ep-{ep}' if ep.isdigit() else a['href']})
-    return out
-
-
-def read_filecr_pages(src):
-    """برامج بعينها في filecr (المثبّتة على حاسوبك): صفحة كلّ برنامج، والمفتاح البرنامج مع تاريخ تحديثه.
-    وكلّ عنصرٍ في programs اسمُ صفحته (فهو من ويندوز)، أو قسمها واسمها مثل "android/snaptube".
-    والبرنامج المضاف حديثًا يُسجَّل تحديثه الحاليّ بلا إرسال."""
-    def data(url, **params):
-        m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', get(url, params=params).text, re.S)
-        return json.loads(m.group(1))['props']['pageProps'] if m else {}
-
-    def page(entry):
-        path = entry if '/' in entry else f'windows/{entry}'
-        slug = path.rsplit('/', 1)[1]
-        link = f'https://filecr.com/{path}/'
-        try:
-            post = data(link).get('post')
-        except requests.HTTPError as e:   # بعض الصفحات خاصّة (404)، لكنّها تظهر في البحث
-            if e.response is None or e.response.status_code != 404:
-                raise
-            q = slug.replace('-', ' ')
-            post = next((x for x in data('https://filecr.com/search/', q=q).get('posts', [])
-                         if x.get('slug') == slug), None)
-            link = 'https://filecr.com/search/?q=' + requests.utils.quote(q)
-        if not post or not post.get('updated_at'):
-            raise ValueError(f'{slug}: لا بيانات البرنامج في الصفحة')
-        return {'key': f"{entry}@{post['updated_at']}", 'group': entry, 'title': clean(post['title']),
-                'url': link, 'date': utc(post['updated_at'])}
-
-    def safe(slug):
-        try:
-            return page(slug), None
-        except Blocked:
-            raise                   # صفحة الحماية تردّ على كلّ الصفحات: لا معنى لطلب الباقي
-        except Exception as e:
-            return None, f'{slug}: {e}'
-
-    try:        # طلبٌ واحد يكشف أنّ الموقع يرفض أو لا يردّ، فلا تُطلب الصفحات كلّها كلّ ساعة بلا فائدة
-        head = page(src['programs'][0]), None
-    except (Blocked, requests.ConnectionError, requests.Timeout):
-        raise
-    except Exception as e:
-        head = None, f"{src['programs'][0]}: {e}"
-    with ThreadPoolExecutor(6) as ex:
-        res = [head] + list(ex.map(safe, src['programs'][1:]))
-    fails = [e for _, e in res if e]
-    if len(fails) == len(res):
-        raise RuntimeError(f'كلّ البرامج أخفقت، أوّلها {fails[0]}')
-    if fails:
-        print(f'    FileCR: أخفق {len(fails)} من {len(res)}: {fails[:10]}')
-    return sorted((it for it, _ in res if it), key=lambda x: x['date'], reverse=True)
-
-
-WINGET_INDEX = 'https://cdn.winget.microsoft.com/cache/source2.msix'
-
-
-def read_winget(src):
-    """آخر نسخةٍ من برامج بعينها في فهرس winget الرسميّ (مستودع مايكروسوفت المفتوح، يُحدَّث مرّاتٍ في اليوم):
-    ملفٌّ واحد من شبكة مايكروسوفت (نحو 4 ميغا، بلا مفتاح ولا حماية) فيه قاعدة index.db وجدولها packages
-    (المعرّف، الاسم، أعلى نسخة). و«packages» في الإعداد: معرّف winget ← [الاسم المعروض، صفحة البرنامج الرسميّة].
-    المفتاح المعرّف مع النسخة؛ والبرنامج المضاف حديثًا تُسجَّل نسخته الحاليّة بلا إرسال (group).
-    ومعرّفٌ لم يعد في الفهرس (غُيّر اسمه) يُذكر مرّةً واحدة ولا يوقف الباقي."""
-    import io
-    import sqlite3
-    import zipfile
-    want = src['packages']
-    with zipfile.ZipFile(io.BytesIO(get(src.get('url', WINGET_INDEX), timeout=120).content)) as z:
-        raw = z.read(next(n for n in z.namelist() if n.endswith('index.db')))
-    db = sqlite3.connect(':memory:')
-    try:
-        db.deserialize(raw)
-        rows = dict(db.execute('SELECT id, latest_version FROM packages WHERE id IN (%s)' % ','.join('?' * len(want)),
-                               list(want)))
-    finally:
-        db.close()
-    if not rows:
-        raise ValueError('لا برنامج من القائمة في فهرس winget')
-    out = []
-    for pid, (name, link) in want.items():
-        ver = rows.get(pid)
-        out.append({'key': f'{pid}@{ver}', 'group': pid, 'title': f'{name} {ver}', 'url': link, 'date': ''} if ver else
-                   {'key': f'{pid}@gone', 'group': pid, 'url': 'https://github.com/microsoft/winget-pkgs', 'date': '',
-                    'title': f'{name}: لم يعد معرّفه ({pid}) في فهرس winget، فتوقّفت متابعته حتّى يُصحَّح في الإعداد'})
     return out
 
 
@@ -885,8 +800,7 @@ def read_wd_spinoffs(src):
     return out
 
 
-READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'filecr_pages': read_filecr_pages, 'winget': read_winget,
-           'carateen': read_carateen,
+READERS = {'rss': read_rss, 'anikoto': read_anikoto, 'carateen': read_carateen,
            'github_releases': read_github_releases, 'youtube': read_youtube, 'tvmaze': read_tvmaze,
            'page_links': read_page_links, 'stardima': read_stardima,
            'mal_relations': read_mal_relations, 'tmdb_works': read_tmdb_works, 'wd_spinoffs': read_wd_spinoffs}
@@ -1027,6 +941,7 @@ class Group:
             if topic_key(s) == s['id'] or topic_key(s) not in self.titles:
                 self.titles[topic_key(s)] = topic_title(s)
         keep = {topic_key(s) for s in srcs}     # والمصادر الموقوفة تبقى مواضيعها، فإن أُعيدت عادت إليها
+        keep |= set(cfg.get('keep_topics', []))     # ومواضيع يكتب فيها بوتٌ آخر (فاحص الحاسوب) لا تُحذف
         for key in [k for k in self.g['topics'] if k not in keep]:
             if self.on:
                 self.drop(key)
